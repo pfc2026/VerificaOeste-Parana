@@ -1,0 +1,27 @@
+{
+  "name": "verifica-oeste",
+  "version": "1.0.0",
+  "description": "Sistema de verificação de notícias falsas para o Oeste do Paraná",
+  "main": "js/server.js",
+  "scripts": {
+    "start": "node js/server.js",
+    "dev": "nodemon js/server.js",
+    "test": "node testGoogleAPI.js"
+  },
+  "keywords": [
+    "fact-check",
+    "fake-news",
+    "parana",
+    "oeste-pr"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
