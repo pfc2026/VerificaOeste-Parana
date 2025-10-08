@@ -1,7 +1,8 @@
 // server.js
-require('dotenv').config();
 const express = require('express');
-const { verificarNoticia } = require('./googleService');
+const axios = require('axios');
+require('dotenv').config();
+const { verificarNoticia } = require('./googleService.js');
 
 const app = express();
 app.use(express.json());
