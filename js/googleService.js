@@ -54,9 +54,10 @@ async function verificarNoticia(texto) {
         };
         
     } catch (error) {
-        console.error('❌ Erro ao verificar notícia:', error);
-        throw error;
+        console.error('❌ Erro na API:', error);
+        throw new Error('Erro ao verificar a notícia: ' + error.message);
     }
 }
 
+// Exportar a função
 module.exports = { verificarNoticia };

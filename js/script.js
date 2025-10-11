@@ -6,6 +6,37 @@ const categorySelect = document.getElementById('categorySelect');
 const loadingSpinner = document.querySelector('.loading-spinner');
 const btnText = document.querySelector('.btn-text');
 
+// Theme Toggle
+const themeToggle = document.getElementById('themeToggle');
+const body = document.body;
+
+// Verificar tema salvo no localStorage
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+    body.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+}
+
+// Função para atualizar ícone do toggle
+function updateThemeIcon(theme) {
+    const icon = themeToggle.querySelector('i');
+    if (theme === 'light') {
+        icon.className = 'fas fa-sun';
+    } else {
+        icon.className = 'fas fa-moon';
+    }
+}
+
+// Event listener para o toggle de tema
+themeToggle.addEventListener('click', () => {
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+});
+
 // Função para mostrar/esconder loading
 function setLoadingState(isLoading) {
     loadingSpinner.style.display = isLoading ? 'inline-block' : 'none';

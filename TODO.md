@@ -1,0 +1,6 @@
+- [ ] Adicionar variáveis CSS para modo claro
+- [ ] Adicionar estilos condicionais para modo claro no CSS
+- [ ] Adicionar botão de toggle de tema no HTML
+- [x] Implementar funcionalidade de toggle no JS
+- [ ] Melhorar seção de features com animações criativas
+- [ ] Corrigir erro de digitação "Toledoo" para "Toledo" no HTML
