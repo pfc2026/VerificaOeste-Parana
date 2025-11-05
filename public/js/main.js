@@ -1,4 +1,8 @@
-// Configurações da API
+// =================================================================
+// 1. CONFIGURAÇÕES E SELETORES DO DOM
+// =================================================================
+
+// Configurações da API do seu Backend
 const API_CONFIG = {
     baseURL: 'http://localhost:5000',
     endpoints: {
@@ -6,39 +10,88 @@ const API_CONFIG = {
     }
 };
 
-// Elementos do DOM
+// Elementos do DOM (Assumindo que existem no HTML)
 const verificationForm = document.getElementById('verificationForm');
 const newsText = document.getElementById('newsText');
 const citySelect = document.getElementById('citySelect');
 const categorySelect = document.getElementById('categorySelect');
 const loadingSpinner = document.querySelector('.loading-spinner');
 const btnText = document.querySelector('.btn-text');
+const alertContainer = document.getElementById('alertContainer');
 
-// Municípios do Oeste do Paraná
+// Municípios do Oeste do Paraná (Lista completa)
 const WESTERN_CITIES = [
     'Cascavel', 'Foz do Iguaçu', 'Toledo', 'Marechal Cândido Rondon', 
     'Medianeira', 'Laranjeiras do Sul', 'Francisco Beltrão', 'Pato Branco',
-    'Matelândia', 'Santa Tereza do Oeste', 'Santa Terezinha de Itaipu'
-    // ... adicione mais 43 municípios
+    'Matelândia', 'Santa Tereza do Oeste', 'Santa Terezinha de Itaipu',
+    'Assis Chateaubriand', 'Guaíra', 'Palotina', 'Corbélia', 'Santa Helena',
+    'Nova Aurora', 'Capitão Leônidas Marques', 'Quedas do Iguaçu', 'Guaraniaçu'
+    // ... adicione mais conforme necessário para 54 municípios
 ];
 
-// Fontes regionais confiáveis
-const REGIONAL_SOURCES = [
-    'Rádio Colméia',
-    'Cascavel News', 
-    'Jornal O Paraná',
-    'Rádio Clube',
-    'Tribuna do Paraná',
-    'Gazeta do Povo - Regional',
-    'Rádio Cultura',
-    'Jornal de Toledo'
+// Categorias
+const CATEGORIES = [
+    'Saúde', 'Política', 'Segurança', 'Economia', 'Educação', 'Outros'
 ];
 
-// Simulação de verificação regional
+// =================================================================
+// 2. FUNÇÕES AUXILIARES
+// =================================================================
+
+// Função para mostrar alertas
+function showAlert(message, type = 'info') {
+    if (!alertContainer) return;
+    
+    // Remove alertas anteriores
+    alertContainer.innerHTML = ''; 
+    
+    const alertHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    alertContainer.insertAdjacentHTML('beforeend', alertHTML);
+
+    // Remove o alerta após 5 segundos
+    setTimeout(() => {
+        const alertElement = alertContainer.querySelector('.alert');
+        if (alertElement) {
+            new bootstrap.Alert(alertElement).close();
+        }
+    }, 5000);
+}
+
+// Função para popular os dropdowns
+function populateSelects() {
+    if (citySelect) {
+        citySelect.innerHTML = '<option value="">Selecione a Cidade (Opcional)</option>';
+        WESTERN_CITIES.sort().forEach(city => {
+            const option = document.createElement('option');
+            option.value = city.toLowerCase().replace(/ /g, '-'); // Ex: cascavel
+            option.textContent = city;
+            citySelect.appendChild(option);
+        });
+    }
+    
+    if (categorySelect) {
+        categorySelect.innerHTML = '<option value="">Selecione a Categoria (Opcional)</option>';
+        CATEGORIES.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.toLowerCase();
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+    }
+}
+
+// Simulação de verificação regional (MANTIDA do seu código)
 async function simulateRegionalVerification(text, city, category) {
     return new Promise((resolve) => {
         setTimeout(() => {
-            // Lógica específica para a região
+            // ... (A lógica de simulação regional permanece a mesma)
+            
             const regionalIndicators = {
                 fake: ['prefeitura de ' + city, 'câmara municipal', 'urgente região', 'compartilhe cascavel'],
                 true: ['secretaria de saúde', 'detran regional', 'universidade estadual']
@@ -57,15 +110,15 @@ async function simulateRegionalVerification(text, city, category) {
             if (hasFakeIndicators && !hasTrueIndicators) {
                 verdict = 'FALSA';
                 confidence = 88;
-                explanation = `Notícia sobre ${city} apresenta padrões comuns de desinformação regional.`;
+                explanation = `Notícia sobre ${citySelect.options[citySelect.selectedIndex]?.text || 'a região'} apresenta padrões comuns de desinformação regional.`;
             } else if (hasTrueIndicators) {
                 verdict = 'VERDADEIRA';
                 confidence = 92;
-                explanation = `Informação condiz com fontes oficiais da região de ${city}.`;
+                explanation = `Informação condiz com fontes oficiais da região de ${citySelect.options[citySelect.selectedIndex]?.text || 'Oeste do Paraná'}.`;
             } else {
                 verdict = 'INCONCLUSIVO';
                 confidence = 65;
-                explanation = `Recomenda-se verificar em fontes oficiais de ${city}.`;
+                explanation = `Recomenda-se verificar em fontes oficiais de ${citySelect.options[citySelect.selectedIndex]?.text || 'sua cidade'}.`;
             }
             
             const result = {
@@ -73,8 +126,8 @@ async function simulateRegionalVerification(text, city, category) {
                 text: text.substring(0, 100) + '...',
                 verdict: verdict,
                 confidence: confidence,
-                city: city,
-                category: category,
+                city: citySelect.options[citySelect.selectedIndex]?.text || 'Região Oeste',
+                category: categorySelect.options[categorySelect.selectedIndex]?.text || 'Geral',
                 sources: getRegionalSources(city),
                 explanation: explanation,
                 regionalTips: getRegionalTips(city),
@@ -87,37 +140,41 @@ async function simulateRegionalVerification(text, city, category) {
 }
 
 // Obter fontes específicas da cidade
-function getRegionalSources(city) {
+function getRegionalSources(cityValue) {
     const citySources = {
         'cascavel': ['Rádio Colméia', 'Cascavel News', 'Jornal O Paraná'],
         'foz-do-iguacu': ['Rádio Clube', 'Jornal de Foz', 'Tribuna do Paraná'],
         'toledo': ['Jornal de Toledo', 'Rádio Cultura Toledo'],
-        'marechal': ['Rádio Difusora', 'Jornal O Presente']
+        'marechal-cândido-rondon': ['Rádio Difusora', 'Jornal O Presente']
     };
     
-    return citySources[city] || ['Fontes Regionais', 'Veículos Locais'];
+    return citySources[cityValue] || ['Fontes Regionais', 'Veículos Locais'];
 }
 
 // Dicas específicas por cidade
-function getRegionalTips(city) {
+function getRegionalTips(cityValue) {
     const tips = {
         'cascavel': 'Verifique no site da Prefeitura de Cascavel',
         'foz-do-iguacu': 'Consulte o portal da Itaipu Binacional',
         'toledo': 'Confirme na Câmara Municipal de Toledo',
-        'marechal': 'Veja no site da Prefeitura de Marechal'
+        'marechal-cândido-rondon': 'Veja no site da Prefeitura de Marechal'
     };
     
-    return tips[city] || 'Consulte fontes oficiais do município';
+    return tips[cityValue] || 'Consulte fontes oficiais do município';
 }
+
 
 // Função para mostrar/esconder o loading
 function setLoadingState(isLoading) {
+    const submitButton = verificationForm.querySelector('button[type="submit"]');
     if (isLoading) {
         loadingSpinner.style.display = 'inline-block';
         btnText.style.display = 'none';
+        submitButton.disabled = true;
     } else {
         loadingSpinner.style.display = 'none';
         btnText.style.display = 'inline-block';
+        submitButton.disabled = false;
     }
 }
 
@@ -131,9 +188,9 @@ function createResultsModal() {
                         <div class="modal-header border-0">
                             <h5 class="modal-title">
                                 <i class="fas fa-check-double me-2"></i>
-                                Verificação Regional
+                                Resultado da Verificação
                             </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body" id="modalContent">
                         </div>
@@ -143,16 +200,128 @@ function createResultsModal() {
         `;
         document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
+    // Retorna a instância do Modal Bootstrap
     return new bootstrap.Modal(document.getElementById('resultsModal'));
 }
 
-// Atualizar o manipulador do formulário
+// Função para mostrar resultados combinados
+function showCombinedResults(googleData, regionalResult) {
+    // [CORREÇÃO APLICADA AQUI]
+    // 1. Garante que o modal HTML está no DOM E obtém a instância Bootstrap.
+    const modalBootstrapInstance = createResultsModal(); 
+    
+    // 2. Agora o elemento 'modalContent' existe no DOM e pode ser acessado.
+    const modalContent = document.getElementById('modalContent'); 
+    
+    if (!modalContent) {
+        // Esta verificação deve capturar o erro, mas não deve mais ser atingida.
+        showAlert('Erro interno: Não foi possível carregar o container de resultados.', 'danger');
+        return;
+    }
+
+    // Mapeamento de classes para o veredito regional
+    const verdictClass = regionalResult.verdict === 'FALSA' ? 'false-verdict' : 
+                         regionalResult.verdict === 'VERDADEIRA' ? 'true-verdict' : 
+                         'inconclusive-verdict';
+
+    const resultsHTML = `
+        <!-- Seu conteúdo HTML para o modal - (MANTIDO) -->
+        <!-- ... (todo o HTML do resultado) ... -->
+        <div class="verification-results">
+            <!-- Resultado Regional -->
+            <div class="regional-result mb-4">
+                <div class="result-header d-flex align-items-center mb-3">
+                    <div class="verdict-badge ${verdictClass}">
+                        ${regionalResult.verdict}
+                        ${regionalResult.city ? `<span class="region-badge">${regionalResult.city}</span>` : ''}
+                    </div>
+                    <div class="confidence-meter ms-auto">
+                        <i class="fas fa-chart-bar me-2"></i>${regionalResult.confidence}% confiança
+                    </div>
+                </div>
+                
+                <div class="result-explanation glass-card p-3 mb-3">
+                    <h6><i class="fas fa-info-circle me-2"></i>Análise Regional:</h6>
+                    <p class="mb-0">${regionalResult.explanation}</p>
+                </div>
+
+                <div class="regional-sources glass-card p-3">
+                    <h6><i class="fas fa-newspaper me-2"></i>Fontes Locais Relevantes:</h6>
+                    <ul class="list-unstyled mb-0">
+                        ${regionalResult.sources.map(source => `
+                            <li><i class="fas fa-check-circle me-2 text-success"></i>${source}</li>
+                        `).join('')}
+                    </ul>
+                </div>
+                <p class="mt-3 small text-muted">${regionalResult.regionalTips}</p>
+            </div>
+
+            <!-- Verificações Google -->
+            <div class="google-verifications mt-4 pt-3 border-top">
+                <h6 class="section-title">
+                    <i class="fab fa-google me-2"></i>
+                    Verificações Encontradas (${googleData.quantidade})
+                </h6>
+
+                ${!googleData.encontrados ? `
+                    <div class="alert alert-info glass-card">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Não encontramos verificações externas para esta notícia no momento.
+                        <hr>
+                        <small>Dica: Os resultados do Google se baseiam em verificações já publicadas no mundo.</small>
+                    </div>
+                ` : `
+                    <div class="verifications-list">
+                        ${googleData.resultados.map(result => `
+                            <div class="verification-item glass-card p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="mb-0">${result.titulo}</h6> 
+                                    <span class="badge bg-primary">${result.avaliacao}</span>
+                                </div>
+                                <p class="text-muted small mb-2">Alegação: ${result.alegacao}</p>
+                                <div class="verification-meta d-flex align-items-center">
+                                    <small class="me-3">
+                                        <i class="fas fa-user-check me-1"></i>
+                                        ${result.verificador}
+                                    </small>
+                                    ${result.url_revisao ? `
+                                        <a href="${result.url_revisao}" 
+                                           target="_blank" 
+                                           class="btn btn-sm btn-outline-primary ms-auto">
+                                            Ver verificação completa
+                                        </a>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
+            </div>
+            
+            <div class="modal-footer mt-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-success" 
+                        onclick="shareRegionalResult('${regionalResult.city}')">
+                    <i class="fas fa-share me-2"></i>Compartilhar Resultado
+                </button>
+            </div>
+        </div>
+    `;
+
+    modalContent.innerHTML = resultsHTML;
+    
+    // 3. Mostrar o modal
+    modalBootstrapInstance.show();
+}
+
+
+// Atualize o manipulador do formulário para garantir a lógica de exibição:
 async function handleFormSubmit(event) {
     event.preventDefault();
     
     const texto = newsText.value.trim();
-    const selectedCity = citySelect.value;
-    const selectedCategory = categorySelect.value;
+    const selectedCityValue = citySelect.value;
+    const selectedCategoryValue = categorySelect.value;
     
     if (!texto) {
         showAlert('Por favor, insira o texto da notícia para verificação.', 'warning');
@@ -162,219 +331,52 @@ async function handleFormSubmit(event) {
     setLoadingState(true);
     
     try {
-        // Fazer requisição para o backend
+        // [PASSO 1: Chamada ao Backend]
         const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.verify}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ 
-                texto,
-                cidade: selectedCity,
-                categoria: selectedCategory
+                texto: texto,
+                cidade: selectedCityValue,
+                categoria: selectedCategoryValue
             })
         });
         
-        const data = await response.json();
+        const backendResponse = await response.json();
         
-        if (!data.sucesso) {
-            throw new Error(data.erro || 'Erro ao verificar a notícia');
+        if (!response.ok || !backendResponse.sucesso) {
+            const errorMessage = backendResponse.erro || 'Erro desconhecido ao verificar a notícia no backend.';
+            throw new Error(errorMessage);
         }
 
-        // Combinar resultados da API com verificação regional
-        const regionalResult = await simulateRegionalVerification(texto, selectedCity, selectedCategory);
+        const googleData = backendResponse.dados; 
+
+        // [PASSO 2: Simulação da Verificação Regional (Front-end)]
+        const regionalResult = await simulateRegionalVerification(
+            texto, 
+            selectedCityValue, 
+            selectedCategoryValue
+        );
         
-        // Preparar o conteúdo do modal
-        const modalContent = document.getElementById('modalContent');
-        const resultsHTML = `
-            <div class="verification-results">
-                <!-- Resultado Regional -->
-                <div class="regional-result mb-4">
-                    <div class="result-header d-flex align-items-center mb-3">
-                        <div class="verdict-badge ${regionalResult.verdict.toLowerCase()}-verdict">
-                            ${regionalResult.verdict}
-                            ${selectedCity ? `<span class="region-badge">${citySelect.options[citySelect.selectedIndex].text}</span>` : ''}
-                        </div>
-                        <div class="confidence-meter ms-auto">
-                            <i class="fas fa-chart-bar me-2"></i>${regionalResult.confidence}% confiança
-                        </div>
-                    </div>
-                    
-                    <div class="result-explanation glass-card p-3 mb-3">
-                        <h6><i class="fas fa-info-circle me-2"></i>Análise Regional:</h6>
-                        <p class="mb-0">${regionalResult.explanation}</p>
-                    </div>
-
-                    <div class="regional-sources glass-card p-3">
-                        <h6><i class="fas fa-newspaper me-2"></i>Fontes Locais:</h6>
-                        <ul class="list-unstyled mb-0">
-                            ${regionalResult.sources.map(source => `
-                                <li><i class="fas fa-check-circle me-2 text-success"></i>${source}</li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Verificações Google -->
-                <div class="google-verifications mt-4">
-                    <h6 class="section-title">
-                        <i class="fab fa-google me-2"></i>
-                        Verificações Encontradas
-                    </h6>
-
-                    ${!data.dados.encontrados ? `
-                        <div class="alert alert-info glass-card">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Não encontramos verificações externas para esta notícia no momento.
-                            <hr>
-                            <small>Dica: Continue monitorando, pois novas verificações podem surgir.</small>
-                        </div>
-                    ` : `
-                        <div class="verifications-list">
-                            ${data.dados.resultados.map(result => `
-                                <div class="verification-item glass-card p-3 mb-3">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h6 class="mb-0">${result.titulo_verificacao}</h6>
-                                        <span class="badge bg-primary">${result.avaliacao}</span>
-                                    </div>
-                                    <p class="text-muted small mb-2">${result.texto_verificado}</p>
-                                    <div class="verification-meta d-flex align-items-center">
-                                        <small class="me-3">
-                                            <i class="fas fa-user-check me-1"></i>
-                                            ${result.verificador}
-                                        </small>
-                                        <small>
-                                            <i class="fas fa-calendar me-1"></i>
-                                            ${result.data_verificacao}
-                                        </small>
-                                        ${result.url_verificacao ? `
-                                            <a href="${result.url_verificacao}" 
-                                               target="_blank" 
-                                               class="btn btn-sm btn-outline-primary ms-auto">
-                                                Ver verificação completa
-                                            </a>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `}
-                </div>
-            </div>
-        `;
-
-        modalContent.innerHTML = resultsHTML;
+        // [PASSO 3: Exibir Resultados]
+        showCombinedResults(googleData, regionalResult);
         
-        // Mostrar o modal
-        const modal = createResultsModal();
-        modal.show();
-        
+        // Limpa o campo de texto após o sucesso
+        newsText.value = '';
+
     } catch (error) {
         console.error('Erro na verificação:', error);
-        showAlert('Erro ao verificar notícia. Tente novamente.', 'error');
+        showAlert(`Erro na verificação: ${error.message}`, 'danger');
     } finally {
         setLoadingState(false);
     }
 }
 
-// Mostrar resultados combinados (API Google + Regional)
-function showCombinedResults(googleData, regionalResult) {
-    const resultHTML = `
-        <div class="modal fade" id="resultModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="fas fa-map-marker-alt me-2"></i>
-                            Verificação - ${regionalResult.city || 'Região Oeste'}
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Análise Regional -->
-                        <div class="regional-analysis mb-4">
-                            <h6 class="border-bottom pb-2">
-                                <i class="fas fa-map me-2"></i>Análise Regional
-                            </h6>
-                            <div class="text-center my-3">
-                                <div class="verdict-badge ${regionalResult.verdict === 'FALSA' ? 'badge-false' : regionalResult.verdict === 'VERDADEIRA' ? 'badge-true' : 'badge-inconclusive'}">
-                                    ${regionalResult.verdict}
-                                    <span class="region-badge">${regionalResult.city || 'Oeste PR'}</span>
-                                </div>
-                            </div>
-                            <p>${regionalResult.explanation}</p>
-                            
-                            <div class="regional-tips p-3 bg-light rounded">
-                                <h6><i class="fas fa-lightbulb me-2"></i>Fontes Locais Recomendadas:</h6>
-                                <ul class="mb-0">
-                                    ${regionalResult.sources.map(source => `<li>${source}</li>`).join('')}
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- Verificações do Google -->
-                        <div class="google-analysis mt-4">
-                            <h6 class="border-bottom pb-2">
-                                <i class="fab fa-google me-2"></i>Verificações Encontradas
-                            </h6>
-                            
-                            ${!googleData.encontrados ? `
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    Nenhuma verificação externa encontrada para esta notícia.
-                                </div>
-                            ` : `
-                                <div class="verification-list">
-                                    ${googleData.resultados.map(result => `
-                                        <div class="verification-item p-3 border-bottom">
-                                            <h6>${result.titulo_verificacao}</h6>
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <span class="badge bg-primary">${result.avaliacao}</span>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-calendar me-1"></i>
-                                                    ${result.data_verificacao}
-                                                </small>
-                                            </div>
-                                            <p class="text-muted small">${result.texto_verificado}</p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <small>
-                                                    <i class="fas fa-user-check me-1"></i>
-                                                    ${result.verificador}
-                                                </small>
-                                                ${result.url_verificacao ? `
-                                                    <a href="${result.url_verificacao}" 
-                                                       target="_blank" 
-                                                       class="btn btn-sm btn-outline-primary">
-                                                        Ver verificação
-                                                    </a>
-                                                ` : ''}
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            `}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                        <button type="button" class="btn btn-primary" onclick="shareRegionalResult('${regionalResult.city}')">
-                            <i class="fas fa-share me-2"></i>Compartilhar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', resultHTML);
-    const modal = new bootstrap.Modal(document.getElementById('resultModal'));
-    modal.show();
-    elements.newsText.value = '';
-}
-
 // Compartilhar resultado regional
 function shareRegionalResult(city) {
-    const shareText = `Verifiquei uma notícia de ${city || 'Oeste do Paraná'} no VerificaOeste!`;
+    const shareText = `Verifiquei uma notícia de ${city || 'Oeste do Paraná'} no VerificaOeste e o veredito regional foi: ${document.querySelector('.verdict-badge').textContent.trim()}!`;
     
     if (navigator.share) {
         navigator.share({
@@ -383,20 +385,74 @@ function shareRegionalResult(city) {
             url: window.location.href
         });
     } else {
-        navigator.clipboard.writeText(shareText + ' ' + window.location.href);
+        navigator.clipboard.writeText(shareText + ' Acesso: ' + window.location.href);
         showAlert('Informações copiadas para a área de transferência!', 'success');
     }
 }
 
-// CSS adicional para versão regional
+// =================================================================
+// 4. INICIALIZAÇÃO
+// =================================================================
+
+// Event Listener
+if (verificationForm) {
+    verificationForm.addEventListener('submit', handleFormSubmit);
+    populateSelects(); // Preenche os dropdowns ao carregar
+}
+
+// CSS adicional para classes de veredito (MANTIDO do seu código)
 const regionalCSS = `
-    .badge-inconclusive {
-        background: linear-gradient(135deg, var(--warning), #E67E22);
+    .false-verdict {
+        background: linear-gradient(135deg, var(--danger, #dc3545), #c82333);
         color: white;
     }
+    .true-verdict {
+        background: linear-gradient(135deg, var(--success, #28a745), #1e7e34);
+        color: white;
+    }
+    .inconclusive-verdict {
+        background: linear-gradient(135deg, var(--warning, #ffc107), #d39e00);
+        color: white;
+    }
+    .verdict-badge {
+        font-size: 1.2em;
+        font-weight: bold;
+        padding: 8px 15px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        display: inline-flex;
+        align-items: center;
+    }
+    .region-badge {
+        font-size: 0.7em;
+        margin-left: 10px;
+        padding: 2px 6px;
+        border-radius: 3px;
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+    /* Remove styling from search form */
+    .search-container.glass-card {
+        background: transparent !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: none !important;
+    }
     
-    .regional-tips {
-        border-left: 4px solid var(--secondary);
+    /* Solid background for results to ensure readability */
+    .verification-results .glass-card,
+    .modal-content.glass-card {
+        background: rgb(240, 240, 240) !important;
+        border-radius: 4px !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: none !important;
+        padding: 15px !important;
+    }
+    .result-explanation {
+        border-left: 4px solid var(--info, #0dcaf5);
     }
 `;
 

@@ -1,30 +1,25 @@
-# TODO: Corrigir Bugs no server.js (Porta em Uso e Melhorias)
+# TODO: Implementar Busca de Notícias na Barra de Pesquisa
 
 ## Passos do Plano Aprovado
 
-### 1. Liberar Porta 5000
-- [x] Identificar e matar o processo Node.js usando a porta 5000.
-  - Usar comandos Windows: `netstat -ano | findstr :5000` para encontrar PID, depois `taskkill /PID <PID> /F`.
-  - Isso resolve o erro EADDRINUSE sem mudar o código.
+### 1. Modificar HTML (public/index.html)
+- [x] Manter textarea, selects de cidade e categoria
+- [x] Alterar título para "Pesquisar Notícias"
+- [x] Alterar texto do botão para "Pesquisar Notícias"
+- [x] Ajustar placeholder da textarea
 
-### 2. Editar server.js
-- [x] Remover import desnecessário de axios.
-- [x] Adicionar Access-Control-Allow-Methods no CORS.
-- [x] Adicionar default para PORT: process.env.PORT || 5000.
-- [x] Logar req.body completo na rota /api/verificar para debug.
+### 2. Modificar JavaScript (public/js/script.js)
+- [x] Ajustar handler do form para busca ao invés de verificação
+- [x] Modificar modal para exibir resultados de busca (título, link, snippet)
+- [x] Usar os filtros de cidade/categoria na busca se selecionados
+- [x] Corrigir porta para 5000 e adicionar logs de debug
 
-### 3. Instalar Dependências (se necessário)
-- [ ] Executar `npm install` para garantir express, dotenv, etc.
+### 3. Ajustar Backend
+- [x] Servidor rodando na porta 5000
+- [x] Substituir API do Google por dados mockados para funcionar sem chaves
 
-### 4. Iniciar Servidor
-- [x] Rodar `node server.js` e verificar logs sem erros.
+### 4. Testar Funcionalidade
+- [x] Verificar se a busca funciona corretamente com dados mockados
+- [x] Testar exibição dos resultados no modal
 
-### 5. Testar Rotas
-- [ ] GET /teste: Deve retornar { mensagem: 'Servidor funcionando! ✅' }.
-- [ ] POST /api/verificar com {texto: "teste"}: Deve processar sem crash (erro 500 se chaves ausentes).
-
-### 6. Verificações Adicionais
-- [ ] Testar frontend: Abrir http://localhost:5000 e submeter form.
-- [ ] Se OK, configurar chaves Google no .env.
-
-Progresso: Iniciando com liberação da porta.
+Progresso: Funcionalidade implementada com dados mockados. Agora a pesquisa mostra resultados no modal.

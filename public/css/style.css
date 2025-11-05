@@ -1,4 +1,4 @@
-<<<<<<<< HEAD:public/css/style.css
+
 :root {
     --primary: #2C3E50;
     --secondary: #27AE60;  /* Verde - cor do Paraná */
@@ -279,7 +279,7 @@ a #row g-4 text-center .col-md-3 col-6 .source-logo:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
-========
+
 :root {
     --primary: #2C3E50;
     --secondary: #27AE60;  /* Verde - cor do Paraná */
@@ -666,4 +666,9 @@ body {
 }
 
 /* Resto do CSS mantém igual do código anterior... */
->>>>>>>> bb28182e4f794cfc1eae066cd6bea2fe1e8e6bee:css/style.css
+a #row g-4 text-center .col-md-3 col-6 .source-logo {
+    height: 120px;
+    transition: all 0.3s ease;
+    text-align: justify;
+    display: flex-center;
+}

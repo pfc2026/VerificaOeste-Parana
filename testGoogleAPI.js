@@ -1,25 +1,37 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
 
+// Certifique-se de que estas variáveis estejam no seu arquivo .env
 const API_KEY = process.env.GOOGLE_API_KEY;
+const API_url_base = process.env.FACT_CHECK_BASE_URL; 
+const API_ENDPOINT = '/v1alpha1/claims:search'; // Endpoint da API Fact Check
 
 async function testGoogleFactCheckAPI(queryText) {
     try {
         if (!API_KEY) {
             throw new Error('API_KEY não configurada. Verifique o arquivo .env');
         }
-
-        // Construir a URL com parâmetros na query string
+        if (!API_url_base) {
+             throw new Error('FACT_CHECK_BASE_URL não configurada. Verifique o arquivo .env');
+        }
+        if (!queryText) {
+             throw new Error('O texto de consulta não pode ser vazio.');
+        }
+        
+        // 1. CONSTRUÇÃO CORRETA DA URL COM TODOS OS PARÂMETROS
         const params = new URLSearchParams({
-            query: queryText,
+            query: queryText, // PARÂMETRO OBRIGATÓRIO
             languageCode: 'pt-BR',
-            key: API_KEY
+            key: API_KEY // A CHAVE DA API
         });
+        
+        // Constrói a URL final: BASE_URL + ENDPOINT + ? + PARÂMETROS
+        const finalUrl = `${API_url_base}${API_ENDPOINT}?${params.toString()}`;
 
-        const url = `https://factchecktools.googleapis.com/v1alpha1/claims:search?key=AIzaSyBkKQOJrBwj3Bk3e3Pd9kS9kFqN8kKp8K4&query=termo_para_verificar${params}`;
-
-        // Usar método GET ao invés de POST
-        const response = await fetch(url, {
+        console.log('Chamando API em:', finalUrl);
+        
+        // Usar método GET e a URL completa
+        const response = await fetch(finalUrl, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json'
@@ -30,13 +42,19 @@ async function testGoogleFactCheckAPI(queryText) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Erro na API: ${response.status} ${response.statusText} - ${errorText}`);
+            let errorData;
+            try {
+                errorData = JSON.parse(errorText);
+            } catch (e) {
+                errorData = { message: errorText };
+            }
+            throw new Error(`Erro na API: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
         }
 
         const data = await response.json();
         
         if (data.claims && data.claims.length > 0) {
-            console.log(`\n✓ Encontradas ${data.claims.length} verificação(ões):\n`);
+            console.log(`\n✓ Encontradas ${data.claims.length} verificação(ões) para "${queryText}":\n`);
             data.claims.forEach((claim, index) => {
                 console.log(`--- Verificação ${index + 1} ---`);
                 console.log('Alegação:', claim.text);
@@ -51,7 +69,7 @@ async function testGoogleFactCheckAPI(queryText) {
                 console.log('');
             });
         } else {
-            console.log('\n✗ Nenhuma verificação encontrada para esta consulta.');
+            console.log(`\n✗ Nenhuma verificação encontrada para a consulta: "${queryText}".`);
         }
         
         console.log('\nResposta completa da API:', JSON.stringify(data, null, 2));
