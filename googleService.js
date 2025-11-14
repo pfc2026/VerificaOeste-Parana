@@ -17,12 +17,19 @@ async function verificarNoticia(texto) {
             throw new Error('Texto não fornecido para verificação.');
         }
 
-        console.log('🔍 Buscando verificação de fatos na Google Fact Check API para:', texto);
+        // Extrai palavras-chave do texto (primeiras 100 palavras)
+        const palavrasChave = texto.trim()
+            .split(/\s+/)
+            .slice(0, 100)
+            .join(' ');
+
+        console.log('🔍 Buscando verificação de fatos para:', palavrasChave.substring(0, 100) + '...');
 
         // 1. CONSTRUÇÃO DA QUERY STRING
         const params = new URLSearchParams({
-            query: texto, // A consulta de verificação
+            query: palavrasChave, // A consulta de verificação com palavras-chave
             languageCode: 'pt-BR',
+            pageSize: 10, // Limita o número de resultados
             key: API_KEY // Chave da API
         });
         

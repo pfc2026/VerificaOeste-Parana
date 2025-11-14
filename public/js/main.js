@@ -1,97 +1,96 @@
-// =================================================================
-// 1. CONFIGURAÇÕES E SELETORES DO DOM
-// =================================================================
+// main.js
 
-// Configurações da API do seu Backend
 const API_CONFIG = {
-    baseURL: 'http://localhost:5000',
+    baseURL: 'http://localhost:3000',
     endpoints: {
         verify: '/api/verificar'
     }
 };
 
-// Elementos do DOM (Assumindo que existem no HTML)
 const verificationForm = document.getElementById('verificationForm');
 const newsText = document.getElementById('newsText');
+const newsLink = document.getElementById('newsLink');
 const citySelect = document.getElementById('citySelect');
 const categorySelect = document.getElementById('categorySelect');
 const loadingSpinner = document.querySelector('.loading-spinner');
 const btnText = document.querySelector('.btn-text');
-const alertContainer = document.getElementById('alertContainer');
 
-// Municípios do Oeste do Paraná (Lista completa)
+if (verificationForm) {
+    console.log('🎯 Formulário encontrado, adicionando listener...');
+    verificationForm.addEventListener('submit', handleFormSubmit);
+} else {
+    console.error('❌ Formulário não encontrado!');
+}
+
 const WESTERN_CITIES = [
     'Cascavel', 'Foz do Iguaçu', 'Toledo', 'Marechal Cândido Rondon', 
     'Medianeira', 'Laranjeiras do Sul', 'Francisco Beltrão', 'Pato Branco',
-    'Matelândia', 'Santa Tereza do Oeste', 'Santa Terezinha de Itaipu',
-    'Assis Chateaubriand', 'Guaíra', 'Palotina', 'Corbélia', 'Santa Helena',
-    'Nova Aurora', 'Capitão Leônidas Marques', 'Quedas do Iguaçu', 'Guaraniaçu'
-    // ... adicione mais conforme necessário para 54 municípios
+    'Matelândia', 'Santa Tereza do Oeste', 'Santa Terezinha de Itaipu'
 ];
 
-// Categorias
-const CATEGORIES = [
-    'Saúde', 'Política', 'Segurança', 'Economia', 'Educação', 'Outros'
+const REGIONAL_SOURCES = [
+    'Rádio Colméia',
+    'Cascavel News', 
+    'Jornal O Paraná',
+    'Rádio Clube',
+    'Tribuna do Paraná',
+    'Gazeta do Povo - Regional',
+    'Rádio Cultura',
+    'Jornal de Toledo'
 ];
 
-// =================================================================
-// 2. FUNÇÕES AUXILIARES
-// =================================================================
-
-// Função para mostrar alertas
-function showAlert(message, type = 'info') {
-    if (!alertContainer) return;
+function createModal(modalId) {
+    console.log('🎨 Criando modal:', modalId);
+    let modalEl = document.getElementById(modalId);
     
-    // Remove alertas anteriores
-    alertContainer.innerHTML = ''; 
-    
-    const alertHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `;
-    alertContainer.insertAdjacentHTML('beforeend', alertHTML);
+    if (!modalEl) {
+        console.log('📦 Modal não existe, criando novo...');
+        const modalHTML = `
+            <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header border-bottom sticky-top bg-white">
+                            <h5 class="modal-title text-wrap" id="${modalId}Label">Resultado da Verificação</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="modalContent" style="max-width: 100%; overflow-x: hidden;">
+                        </div>
+                        <div class="modal-footer border-top">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        modalEl = document.getElementById(modalId);
+        console.log('✅ Modal criado com sucesso');
+    }
 
-    // Remove o alerta após 5 segundos
-    setTimeout(() => {
-        const alertElement = alertContainer.querySelector('.alert');
-        if (alertElement) {
-            new bootstrap.Alert(alertElement).close();
-        }
-    }, 5000);
+    return new bootstrap.Modal(modalEl);
 }
 
-// Função para popular os dropdowns
 function populateSelects() {
-    if (citySelect) {
-        citySelect.innerHTML = '<option value="">Selecione a Cidade (Opcional)</option>';
-        WESTERN_CITIES.sort().forEach(city => {
-            const option = document.createElement('option');
-            option.value = city.toLowerCase().replace(/ /g, '-'); // Ex: cascavel
-            option.textContent = city;
-            citySelect.appendChild(option);
-        });
-    }
-    
-    if (categorySelect) {
-        categorySelect.innerHTML = '<option value="">Selecione a Categoria (Opcional)</option>';
-        CATEGORIES.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.toLowerCase();
-            option.textContent = category;
-            categorySelect.appendChild(option);
-        });
-    }
+    WESTERN_CITIES.forEach(city => {
+        const option = document.createElement('option');
+        option.value = city.toLowerCase().replace(/\s/g, '-');
+        option.textContent = city;
+        citySelect.appendChild(option);
+    });
+
+    ['Política', 'Economia', 'Segurança', 'Saúde', 'Geral'].forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.toLowerCase();
+        option.textContent = category;
+        categorySelect.appendChild(option);
+    });
 }
 
-// Simulação de verificação regional (MANTIDA do seu código)
+window.onload = populateSelects;
+
 async function simulateRegionalVerification(text, city, category) {
     return new Promise((resolve) => {
         setTimeout(() => {
-            // ... (A lógica de simulação regional permanece a mesma)
-            
             const regionalIndicators = {
                 fake: ['prefeitura de ' + city, 'câmara municipal', 'urgente região', 'compartilhe cascavel'],
                 true: ['secretaria de saúde', 'detran regional', 'universidade estadual']
@@ -110,15 +109,15 @@ async function simulateRegionalVerification(text, city, category) {
             if (hasFakeIndicators && !hasTrueIndicators) {
                 verdict = 'FALSA';
                 confidence = 88;
-                explanation = `Notícia sobre ${citySelect.options[citySelect.selectedIndex]?.text || 'a região'} apresenta padrões comuns de desinformação regional.`;
+                explanation = `Notícia sobre ${city} apresenta padrões comuns de desinformação regional.`;
             } else if (hasTrueIndicators) {
                 verdict = 'VERDADEIRA';
                 confidence = 92;
-                explanation = `Informação condiz com fontes oficiais da região de ${citySelect.options[citySelect.selectedIndex]?.text || 'Oeste do Paraná'}.`;
+                explanation = `Informação condiz com fontes oficiais da região de ${city}.`;
             } else {
                 verdict = 'INCONCLUSIVO';
                 confidence = 65;
-                explanation = `Recomenda-se verificar em fontes oficiais de ${citySelect.options[citySelect.selectedIndex]?.text || 'sua cidade'}.`;
+                explanation = `Recomenda-se verificar em fontes oficiais de ${city}.`;
             }
             
             const result = {
@@ -126,11 +125,11 @@ async function simulateRegionalVerification(text, city, category) {
                 text: text.substring(0, 100) + '...',
                 verdict: verdict,
                 confidence: confidence,
-                city: citySelect.options[citySelect.selectedIndex]?.text || 'Região Oeste',
-                category: categorySelect.options[categorySelect.selectedIndex]?.text || 'Geral',
-                sources: getRegionalSources(city),
+                city: city,
+                category: category,
+                sources: REGIONAL_SOURCES.slice(0, 4),
                 explanation: explanation,
-                regionalTips: getRegionalTips(city),
+                regionalTips: 'Consulte fontes oficiais do município',
                 timestamp: new Date().toISOString()
             };
             
@@ -139,58 +138,46 @@ async function simulateRegionalVerification(text, city, category) {
     });
 }
 
-// Obter fontes específicas da cidade
-function getRegionalSources(cityValue) {
-    const citySources = {
-        'cascavel': ['Rádio Colméia', 'Cascavel News', 'Jornal O Paraná'],
-        'foz-do-iguacu': ['Rádio Clube', 'Jornal de Foz', 'Tribuna do Paraná'],
-        'toledo': ['Jornal de Toledo', 'Rádio Cultura Toledo'],
-        'marechal-cândido-rondon': ['Rádio Difusora', 'Jornal O Presente']
-    };
-    
-    return citySources[cityValue] || ['Fontes Regionais', 'Veículos Locais'];
-}
-
-// Dicas específicas por cidade
-function getRegionalTips(cityValue) {
-    const tips = {
-        'cascavel': 'Verifique no site da Prefeitura de Cascavel',
-        'foz-do-iguacu': 'Consulte o portal da Itaipu Binacional',
-        'toledo': 'Confirme na Câmara Municipal de Toledo',
-        'marechal-cândido-rondon': 'Veja no site da Prefeitura de Marechal'
-    };
-    
-    return tips[cityValue] || 'Consulte fontes oficiais do município';
-}
-
-
-// Função para mostrar/esconder o loading
 function setLoadingState(isLoading) {
-    const submitButton = verificationForm.querySelector('button[type="submit"]');
     if (isLoading) {
         loadingSpinner.style.display = 'inline-block';
         btnText.style.display = 'none';
-        submitButton.disabled = true;
     } else {
         loadingSpinner.style.display = 'none';
         btnText.style.display = 'inline-block';
-        submitButton.disabled = false;
     }
 }
 
-// Criar o modal de resultados se não existir
+function showAlert(message, type = 'warning') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} glass-card alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.getElementById('alertContainer').innerHTML = '';
+    document.getElementById('alertContainer').appendChild(alertDiv);
+    
+    setTimeout(() => alertDiv.remove(), 5000);
+}
+
 function createResultsModal() {
-    if (!document.getElementById('resultsModal')) {
+    const modalId = 'resultsModal';
+    let modalEl = document.getElementById(modalId);
+    
+    if (!modalEl) {
         const modalHTML = `
-            <div class="modal fade" id="resultsModal" tabindex="-1">
+            <div class="modal fade" id="${modalId}" tabindex="-1">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content glass-card">
                         <div class="modal-header border-0">
                             <h5 class="modal-title">
-                                <i class="fas fa-check-double me-2"></i>
+                                <i class="fas fa-search me-2"></i>
                                 Resultado da Verificação
                             </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body" id="modalContent">
                         </div>
@@ -199,264 +186,298 @@ function createResultsModal() {
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+        modalEl = document.getElementById(modalId);
     }
-    // Retorna a instância do Modal Bootstrap
-    return new bootstrap.Modal(document.getElementById('resultsModal'));
+    return new bootstrap.Modal(modalEl);
 }
 
-// Função para mostrar resultados combinados
-function showCombinedResults(googleData, regionalResult) {
-    // [CORREÇÃO APLICADA AQUI]
-    // 1. Garante que o modal HTML está no DOM E obtém a instância Bootstrap.
-    const modalBootstrapInstance = createResultsModal(); 
-    
-    // 2. Agora o elemento 'modalContent' existe no DOM e pode ser acessado.
-    const modalContent = document.getElementById('modalContent'); 
-    
-    if (!modalContent) {
-        // Esta verificação deve capturar o erro, mas não deve mais ser atingida.
-        showAlert('Erro interno: Não foi possível carregar o container de resultados.', 'danger');
-        return;
-    }
-
-    // Mapeamento de classes para o veredito regional
-    const verdictClass = regionalResult.verdict === 'FALSA' ? 'false-verdict' : 
-                         regionalResult.verdict === 'VERDADEIRA' ? 'true-verdict' : 
-                         'inconclusive-verdict';
-
-    const resultsHTML = `
-        <!-- Seu conteúdo HTML para o modal - (MANTIDO) -->
-        <!-- ... (todo o HTML do resultado) ... -->
-        <div class="verification-results">
-            <!-- Resultado Regional -->
-            <div class="regional-result mb-4">
-                <div class="result-header d-flex align-items-center mb-3">
-                    <div class="verdict-badge ${verdictClass}">
-                        ${regionalResult.verdict}
-                        ${regionalResult.city ? `<span class="region-badge">${regionalResult.city}</span>` : ''}
-                    </div>
-                    <div class="confidence-meter ms-auto">
-                        <i class="fas fa-chart-bar me-2"></i>${regionalResult.confidence}% confiança
-                    </div>
-                </div>
-                
-                <div class="result-explanation glass-card p-3 mb-3">
-                    <h6><i class="fas fa-info-circle me-2"></i>Análise Regional:</h6>
-                    <p class="mb-0">${regionalResult.explanation}</p>
-                </div>
-
-                <div class="regional-sources glass-card p-3">
-                    <h6><i class="fas fa-newspaper me-2"></i>Fontes Locais Relevantes:</h6>
-                    <ul class="list-unstyled mb-0">
-                        ${regionalResult.sources.map(source => `
-                            <li><i class="fas fa-check-circle me-2 text-success"></i>${source}</li>
-                        `).join('')}
-                    </ul>
-                </div>
-                <p class="mt-3 small text-muted">${regionalResult.regionalTips}</p>
-            </div>
-
-            <!-- Verificações Google -->
-            <div class="google-verifications mt-4 pt-3 border-top">
-                <h6 class="section-title">
-                    <i class="fab fa-google me-2"></i>
-                    Verificações Encontradas (${googleData.quantidade})
-                </h6>
-
-                ${!googleData.encontrados ? `
-                    <div class="alert alert-info glass-card">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Não encontramos verificações externas para esta notícia no momento.
-                        <hr>
-                        <small>Dica: Os resultados do Google se baseiam em verificações já publicadas no mundo.</small>
-                    </div>
-                ` : `
-                    <div class="verifications-list">
-                        ${googleData.resultados.map(result => `
-                            <div class="verification-item glass-card p-3 mb-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h6 class="mb-0">${result.titulo}</h6> 
-                                    <span class="badge bg-primary">${result.avaliacao}</span>
-                                </div>
-                                <p class="text-muted small mb-2">Alegação: ${result.alegacao}</p>
-                                <div class="verification-meta d-flex align-items-center">
-                                    <small class="me-3">
-                                        <i class="fas fa-user-check me-1"></i>
-                                        ${result.verificador}
-                                    </small>
-                                    ${result.url_revisao ? `
-                                        <a href="${result.url_revisao}" 
-                                           target="_blank" 
-                                           class="btn btn-sm btn-outline-primary ms-auto">
-                                            Ver verificação completa
-                                        </a>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `}
-            </div>
-            
-            <div class="modal-footer mt-4">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-success" 
-                        onclick="shareRegionalResult('${regionalResult.city}')">
-                    <i class="fas fa-share me-2"></i>Compartilhar Resultado
-                </button>
-            </div>
-        </div>
-    `;
-
-    modalContent.innerHTML = resultsHTML;
-    
-    // 3. Mostrar o modal
-    modalBootstrapInstance.show();
-}
-
-
-// Atualize o manipulador do formulário para garantir a lógica de exibição:
 async function handleFormSubmit(event) {
     event.preventDefault();
-    
-    const texto = newsText.value.trim();
-    const selectedCityValue = citySelect.value;
-    const selectedCategoryValue = categorySelect.value;
-    
-    if (!texto) {
-        showAlert('Por favor, insira o texto da notícia para verificação.', 'warning');
-        return;
-    }
-    
     setLoadingState(true);
     
     try {
-        // [PASSO 1: Chamada ao Backend]
-        const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.verify}`, {
+        const texto = newsText.value.trim();
+        const link = newsLink.value.trim();
+        const selectedCity = citySelect.value;
+        const selectedCategory = categorySelect.value;
+
+        const isLinkMode = !!link;
+        const isTextMode = !!texto;
+        
+        if (!isTextMode && !isLinkMode) {
+            showAlert('Por favor, digite o texto OU cole um link da notícia para verificação.', 'warning');
+            setLoadingState(false);
+            return;
+        }
+        
+        if (isTextMode && isLinkMode) {
+            showAlert('Por favor, escolha apenas UM método: texto ou link.', 'warning');
+            setLoadingState(false);
+            return;
+        }
+
+        console.log('📝 Dados do formulário:', {
+            modo: isLinkMode ? 'link' : 'texto',
+            texto: isTextMode ? texto : null,
+            link: isLinkMode ? link : null,
+            cidade: selectedCity,
+            categoria: selectedCategory
+        });
+
+        console.log('🔄 Iniciando requisição...');
+
+        const url = `${API_CONFIG.baseURL}${API_CONFIG.endpoints.verify}`;
+        console.log('🌐 URL da requisição:', url);
+
+        const requestData = {
+            texto: isTextMode ? texto : null,
+            link: isLinkMode ? link : null,
+            cidade: selectedCity,
+            categoria: selectedCategory,
+            modo: isLinkMode ? 'link' : 'texto'
+        };
+        
+        console.log('📤 Dados sendo enviados:', requestData);
+
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ 
-                texto: texto,
-                cidade: selectedCityValue,
-                categoria: selectedCategoryValue
-            })
+            body: JSON.stringify(requestData)
         });
-        
-        const backendResponse = await response.json();
-        
-        if (!response.ok || !backendResponse.sucesso) {
-            const errorMessage = backendResponse.erro || 'Erro desconhecido ao verificar a notícia no backend.';
-            throw new Error(errorMessage);
+
+        if (!response.ok) {
+            console.error('❌ Erro na resposta:', response.status, response.statusText);
+            throw new Error(`Erro na requisição: ${response.status} ${response.statusText}`);
         }
 
-        const googleData = backendResponse.dados; 
+        console.log('✅ Resposta recebida');
+        const data = await response.json();
+        console.log('📊 Dados recebidos:', data);
 
-        // [PASSO 2: Simulação da Verificação Regional (Front-end)]
-        const regionalResult = await simulateRegionalVerification(
-            texto, 
-            selectedCityValue, 
-            selectedCategoryValue
-        );
-        
-        // [PASSO 3: Exibir Resultados]
-        showCombinedResults(googleData, regionalResult);
-        
-        // Limpa o campo de texto após o sucesso
-        newsText.value = '';
+        if (data.sucesso) {
+            console.log('✨ Criando modal com os resultados');
+            const modal = createModal('resultadoModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            console.log('Dados recebidos para exibição:', data.dados);
+            
+            // Verifica se é uma análise de link ou de texto e se temos análise de IA
+            const isLink = requestData.modo === 'link';
+            const hasAIAnalysis = data.dados.analiseIA && typeof data.dados.analiseIA === 'object';
 
+            // Início do HTML
+            let htmlContent = '<div class="result-card">';
+
+            // Cabeçalho
+            htmlContent += `
+                <h4 class="mb-3 text-center">
+                    ${isLink ? 'Análise da Notícia' : 'Verificações Encontradas'}
+                </h4>`;
+
+            // Análise de IA (apenas para links)
+            if (isLink && hasAIAnalysis) {
+                console.log('🤖 Renderizando análise de IA:', data.dados.analiseIA);
+                const analiseIA = data.dados.analiseIA;
+                const score = analiseIA.porcentagemVerdade || analiseIA.credibilityScore || 0;
+                
+                htmlContent += `
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-robot me-2"></i>
+                                Análise por Inteligência Artificial
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="mb-3 text-center">Probabilidade de veracidade</h5>
+                            <div class="d-flex align-items-center justify-content-center mb-4">
+                                <div class="progress" style="height: 40px; width: 80%;">
+                                    <div class="progress-bar ${score >= 70 ? 'bg-success' : score >= 40 ? 'bg-warning' : 'bg-danger'}" 
+                                        role="progressbar" 
+                                        style="width: ${score}%" 
+                                        aria-valuenow="${score}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="100">
+                                        <span style="font-size: 1.2rem; font-weight: bold;">${score}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert ${score >= 70 ? 'alert-success' : score >= 40 ? 'alert-warning' : 'alert-danger'} text-center">
+                                <i class="fas ${score >= 70 ? 'fa-check-circle' : score >= 40 ? 'fa-exclamation-circle' : 'fa-times-circle'} me-2"></i>
+                                ${score >= 70 ? 'Esta notícia tem alta probabilidade de ser verdadeira.' : 
+                                  score >= 40 ? 'Esta notícia tem elementos que precisam ser verificados.' : 
+                                  'Esta notícia tem alta probabilidade de ser falsa.'}
+                            </div>
+
+                            ${data.dados.texto.titulo || data.dados.texto.conteudo ? `
+                                <div class="mt-4">
+                                    <h6 class="mb-3">Notícia Analisada:</h6>
+                                    ${data.dados.texto.titulo ? `<p class="text-muted">${data.dados.texto.titulo}</p>` : ''}
+                                    ${data.dados.texto.conteudo ? `
+                                        <p class="small text-muted">
+                                            ${data.dados.texto.conteudo.substring(0, 200).replace(/\n+/g, ' ')}...
+                                        </p>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                            
+                            <div class="mt-3">
+                                <h6>Detalhes da Análise:</h6>
+                                <div class="row">
+                                    ${data.dados.analiseIA.detalhes.map(detalhe => `
+                                        <div class="col-12 col-sm-6 mb-2">
+                                            <small>
+                                                <strong>${detalhe.aspect}:</strong> 
+                                                <span class="text-${detalhe.probability >= 70 ? 'success' : detalhe.probability >= 40 ? 'warning' : 'danger'}">
+                                                    ${detalhe.probability}%
+                                                </span>
+                                            </small>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
+            // Fact-checking section
+            const factChecks = data.dados.factChecks ? (
+                Array.isArray(data.dados.factChecks) ? data.dados.factChecks : 
+                (data.dados.factChecks.resultados || [])
+            ) : [];
+            console.log('🔍 Fact checks encontrados:', factChecks);
+            const quantidade = factChecks.length;
+            const encontrados = quantidade > 0;
+
+            // Se temos verificações ou estamos no modo de link
+            if (encontrados || isLink) {
+
+                // Statistics card (apenas para pesquisa por texto)
+                if (!isLink && encontrados) {
+                    htmlContent += `
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chart-pie me-2"></i>
+                                    Resumo das Verificações
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info mb-4">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Encontramos <strong>${quantidade}</strong> verificações sobre este assunto
+                                </div>
+                                
+                                <div class="row mb-4">
+                                    <div class="col-4 text-center">
+                                        <h3 class="text-danger">${factChecks.filter(f => (f.avaliacao || '').toLowerCase().includes('falso')).length}</h3>
+                                        <small>FALSO</small>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <h3 class="text-warning">${factChecks.filter(f => (f.avaliacao || '').toLowerCase().includes('enganoso')).length}</h3>
+                                        <small>ENGANOSO</small>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <h3 class="text-success">${factChecks.filter(f => (f.avaliacao || '').toLowerCase().includes('verdadeiro')).length}</h3>
+                                        <small>VERDADEIRO</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+
+                // Lista de verificações
+                if (encontrados) {
+                    htmlContent += `
+                        <div class="card mb-4">
+                            <div class="card-header ${isLink ? 'bg-secondary' : 'bg-light'} ${isLink ? 'text-white' : ''}">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-list-ul me-2"></i>
+                                    ${isLink ? 'Verificações Relacionadas' : 'Detalhes das Verificações'}
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="result-details">
+                                    ${factChecks.map(item => `
+                                        <div class="result-item p-3 border-bottom ${
+                                            (item.avaliacao || '').toLowerCase().includes('falso') ? 'border-danger bg-danger bg-opacity-10' : 
+                                            (item.avaliacao || '').toLowerCase().includes('enganoso') ? 'border-warning bg-warning bg-opacity-10' : 
+                                            'border-success bg-success bg-opacity-10'
+                                        }">
+                                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2 mb-3">
+                                                <span class="badge ${
+                                                    (item.avaliacao || '').toLowerCase().includes('falso') ? 'bg-danger' : 
+                                                    (item.avaliacao || '').toLowerCase().includes('enganoso') ? 'bg-warning text-dark' : 
+                                                    'bg-success'
+                                                } px-3 py-2 text-wrap fs-6">
+                                                    ${item.avaliacao || 'Não especificado'}
+                                                </span>
+                                                <span class="badge bg-secondary px-3 py-2">
+                                                    <i class="fas fa-check-circle me-1"></i>
+                                                    ${item.verificador || 'Fonte desconhecida'}
+                                                </span>
+                                            </div>
+                                            <div class="mt-2">
+                                                <h6 class="fw-bold text-break mb-3">${item.alegacao || 'Sem descrição disponível'}</h6>
+                                                <div class="d-flex flex-wrap gap-3 align-items-center">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-user me-1"></i>
+                                                        ${item.autor || 'Autor não informado'}
+                                                    </small>
+                                                    ${item.url_revisao ? `
+                                                        <a href="${item.url_revisao}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-external-link-alt me-1"></i>
+                                                            Ver verificação completa
+                                                        </a>
+                                                    ` : ''}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    // Se não encontrou verificações mas tem análise de IA
+                    if (isLink && hasAIAnalysis) {
+                        htmlContent += `
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Não encontramos verificações anteriores sobre esta notícia em nossa base de dados.
+                                <hr>
+                                <small class="d-block mt-2">
+                                    <i class="fas fa-robot me-1"></i>
+                                    Você pode consultar a análise de IA acima para uma avaliação preliminar do conteúdo.
+                                </small>
+                            </div>`;
+                    } else {
+                        htmlContent += `
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Nenhuma verificação encontrada na nossa base de dados para este ${isLink ? 'link' : 'texto'}.
+                                ${isLink ? '<hr><small class="d-block mt-2">Aguarde enquanto nossa IA analisa o conteúdo...</small>' : ''}
+                            </div>`;
+                    }
+                }
+            }
+
+            // Fecha div principal
+            htmlContent += '</div>';
+            
+            // Atualiza o conteúdo do modal
+            modalContent.innerHTML = htmlContent;
+            modal.show();
+            console.log('✅ Modal exibido com sucesso');
+        } else {
+            showAlert('Não foi possível verificar a notícia. Tente novamente.', 'error');
+        }
     } catch (error) {
-        console.error('Erro na verificação:', error);
-        showAlert(`Erro na verificação: ${error.message}`, 'danger');
+        console.error('Erro:', error);
+        showAlert('Erro ao processar a requisição. Tente novamente.', 'error');
     } finally {
         setLoadingState(false);
     }
 }
-
-// Compartilhar resultado regional
-function shareRegionalResult(city) {
-    const shareText = `Verifiquei uma notícia de ${city || 'Oeste do Paraná'} no VerificaOeste e o veredito regional foi: ${document.querySelector('.verdict-badge').textContent.trim()}!`;
-    
-    if (navigator.share) {
-        navigator.share({
-            title: 'VerificaOeste - Notícias do Oeste do Paraná',
-            text: shareText,
-            url: window.location.href
-        });
-    } else {
-        navigator.clipboard.writeText(shareText + ' Acesso: ' + window.location.href);
-        showAlert('Informações copiadas para a área de transferência!', 'success');
-    }
-}
-
-// =================================================================
-// 4. INICIALIZAÇÃO
-// =================================================================
-
-// Event Listener
-if (verificationForm) {
-    verificationForm.addEventListener('submit', handleFormSubmit);
-    populateSelects(); // Preenche os dropdowns ao carregar
-}
-
-// CSS adicional para classes de veredito (MANTIDO do seu código)
-const regionalCSS = `
-    .false-verdict {
-        background: linear-gradient(135deg, var(--danger, #dc3545), #c82333);
-        color: white;
-    }
-    .true-verdict {
-        background: linear-gradient(135deg, var(--success, #28a745), #1e7e34);
-        color: white;
-    }
-    .inconclusive-verdict {
-        background: linear-gradient(135deg, var(--warning, #ffc107), #d39e00);
-        color: white;
-    }
-    .verdict-badge {
-        font-size: 1.2em;
-        font-weight: bold;
-        padding: 8px 15px;
-        border-radius: 5px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        display: inline-flex;
-        align-items: center;
-    }
-    .region-badge {
-        font-size: 0.7em;
-        margin-left: 10px;
-        padding: 2px 6px;
-        border-radius: 3px;
-        background-color: rgba(255, 255, 255, 0.3);
-    }
-    /* Remove styling from search form */
-    .search-container.glass-card {
-        background: transparent !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        border: none !important;
-    }
-    
-    /* Solid background for results to ensure readability */
-    .verification-results .glass-card,
-    .modal-content.glass-card {
-        background: rgb(240, 240, 240) !important;
-        border-radius: 4px !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        border: none !important;
-        padding: 15px !important;
-    }
-    .result-explanation {
-        border-left: 4px solid var(--info, #0dcaf5);
-    }
-`;
-
-// Adicionar CSS regional
-const regionalStyle = document.createElement('style');
-regionalStyle.textContent = regionalCSS;
-document.head.appendChild(regionalStyle);
