@@ -233,6 +233,127 @@
         </div>
     </section>
 
+    <!-- Seção Educacional: Como Identificar Fake News -->
+    <section id="education" class="education-section py-5 bg-light">
+        <div class="container">
+            <h2 class="mb-5 text-center">
+                <i class="fas fa-graduation-cap me-2"></i>Como Identificar Fake News
+            </h2>
+
+            <!-- Abas de Filtro -->
+            <div class="education-tabs mb-5">
+                <button class="tab-btn active" data-filter="todos">Todos</button>
+                <button class="tab-btn" data-filter="formato">Formato</button>
+                <button class="tab-btn" data-filter="linguagem">Linguagem</button>
+                <button class="tab-btn" data-filter="verificacao">Verificação</button>
+                <button class="tab-btn" data-filter="analise">Análise</button>
+                <button class="tab-btn" data-filter="psicologia">Psicologia</button>
+                <button class="tab-btn" data-filter="midia">Mídia</button>
+            </div>
+
+            <!-- Grid de Lições -->
+            <div id="educationContent" class="education-grid">
+                <!-- Lição 1 -->
+                <div class="education-card" data-category="formato">
+                    <div class="card-header">
+                        <i class="fas fa-exclamation-circle card-icon"></i>
+                        <h4 class="card-title">Atenção com EXCESSO DE MAIÚSCULAS</h4>
+                    </div>
+                    <div class="badge-group">
+                        <span class="badge badge-primary">Formato</span>
+                        <span class="badge badge-basic">Básico</span>
+                    </div>
+                    <p class="card-description">Textos com muitas LETRAS MAIÚSCULAS frequentemente indicam conteúdo sensacionalista...</p>
+                    <button class="btn-read-more" onclick="openLesson('maiusculas')">Ler Mais →</button>
+                </div>
+
+                <!-- Lição 2 -->
+                <div class="education-card" data-category="linguagem">
+                    <div class="card-header">
+                        <i class="fas fa-bell card-icon"></i>
+                        <h4 class="card-title">Palavras Alarmistas e Sensacionalistas</h4>
+                    </div>
+                    <div class="badge-group">
+                        <span class="badge badge-primary">Linguagem</span>
+                        <span class="badge badge-basic">Básico</span>
+                    </div>
+                    <p class="card-description">Fake news frequentemente usam palavras como "URGENTE", "BOMBA", "IMPACTANTE"...</p>
+                    <button class="btn-read-more" onclick="openLesson('alarmista')">Ler Mais →</button>
+                </div>
+
+                <!-- Lição 3 -->
+                <div class="education-card" data-category="verificacao">
+                    <div class="card-header">
+                        <i class="fas fa-link card-icon"></i>
+                        <h4 class="card-title">Verificando as Fontes</h4>
+                    </div>
+                    <div class="badge-group">
+                        <span class="badge badge-primary">Verificação</span>
+                        <span class="badge badge-intermediate">Intermediário</span>
+                    </div>
+                    <p class="card-description">Uma das melhores formas de detectar fake news é verificar a origem da inform...</p>
+                    <button class="btn-read-more" onclick="openLesson('fontes')">Ler Mais →</button>
+                </div>
+
+                <!-- Lição 4 -->
+                <div class="education-card" data-category="analise">
+                    <div class="card-header">
+                        <i class="fas fa-building card-icon"></i>
+                        <h4 class="card-title">A Importância do Contexto</h4>
+                    </div>
+                    <div class="badge-group">
+                        <span class="badge badge-primary">Análise</span>
+                        <span class="badge badge-intermediate">Intermediário</span>
+                    </div>
+                    <p class="card-description">Muitas fake news removem informação de contexto para distorcer significado...</p>
+                    <button class="btn-read-more" onclick="openLesson('contexto')">Ler Mais →</button>
+                </div>
+
+                <!-- Lição 5 -->
+                <div class="education-card" data-category="psicologia">
+                    <div class="card-header">
+                        <i class="fas fa-water card-icon"></i>
+                        <h4 class="card-title">Manipulação Emocional</h4>
+                    </div>
+                    <div class="badge-group">
+                        <span class="badge badge-primary">Psicologia</span>
+                        <span class="badge badge-advanced">Avançado</span>
+                    </div>
+                    <p class="card-description">Fake news frequentemente exploram emoções (raiva, medo, esperança) para faz...</p>
+                    <button class="btn-read-more" onclick="openLesson('emocional')">Ler Mais →</button>
+                </div>
+
+                <!-- Lição 6 -->
+                <div class="education-card" data-category="midia">
+                    <div class="card-header">
+                        <i class="fas fa-image card-icon"></i>
+                        <h4 class="card-title">Imagens Manipuladas e Deep Fakes</h4>
+                    </div>
+                    <div class="badge-group">
+                        <span class="badge badge-primary">Mídia</span>
+                        <span class="badge badge-advanced">Avançado</span>
+                    </div>
+                    <p class="card-description">Imagens e vídeos são frequentemente manipulados ou tirados de contexto...</p>
+                    <button class="btn-read-more" onclick="openLesson('midia')">Ler Mais →</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de Lição Educacional -->
+    <div id="lessonModal" class="lesson-modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeLesson()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="lessonTitle">Título da Lição</h2>
+                <button class="modal-close" onclick="closeLesson()">&times;</button>
+            </div>
+            <div class="modal-body" id="lessonBody">
+                <!-- Conteúdo será inserido aqui -->
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -272,7 +393,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <!-- Sistema de Dark Mode -->
     <script src="js/dark-mode.js"></script>
+    <!-- Sistema Educacional - Lições Fake News -->
+    <script src="js/education.js"></script>
     <!-- Seu código principal (ajustado para lidar com o link) -->
     <script src="js/main.js"></script>
+
+    <script src="server.js"></script>
 </body>
 </html>

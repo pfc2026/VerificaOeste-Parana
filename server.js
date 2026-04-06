@@ -32,6 +32,15 @@ app.use((req, res, next) => {
     next();
 });
 
+// Handler global de erros não capturados
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Promise rejection não capturada:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('❌ Erro não capturado:', error);
+});
+
 // Função para extrair texto de uma URL
 async function extrairTextoDoLink(url) {
     try {
@@ -42,10 +51,10 @@ async function extrairTextoDoLink(url) {
         // Detecta e converte a codificação corretamente
         const contentType = response.headers['content-type'];
         const charset = contentType && contentType.includes('charset=') 
-            ? contentType.split('charset=')[1] 
+            ? contentType.split('charset=')[1].trim() 
             : 'utf-8';
             
-        const html = new TextDecoder(charset).decode(response.data);
+        const html = Buffer.from(response.data).toString(charset);
         const $ = cheerio.load(html, { decodeEntities: true });
         
         // Remove scripts, styles e tags desnecessárias
@@ -93,10 +102,10 @@ async function analisarTextoComTensorFlow(texto) {
         
         // Extrai e normaliza os scores do TensorFlow (0-100 scale)
         const tfScores = {
-            toxicity: (1 - tfPredictions.find(p => p.label === 'toxicity')?.results[0]?.probabilities[1] || 0) * 100,
-            severeToxicity: (1 - tfPredictions.find(p => p.label === 'severe_toxicity')?.results[0]?.probabilities[1] || 0) * 100,
-            threat: (1 - tfPredictions.find(p => p.label === 'threat')?.results[0]?.probabilities[1] || 0) * 100,
-            insult: (1 - tfPredictions.find(p => p.label === 'insult')?.results[0]?.probabilities[1] || 0) * 100
+            toxicity: (1 - (tfPredictions.find(p => p.label === 'toxicity')?.results[0]?.probabilities[1] || 0)) * 100,
+            severeToxicity: (1 - (tfPredictions.find(p => p.label === 'severe_toxicity')?.results[0]?.probabilities[1] || 0)) * 100,
+            threat: (1 - (tfPredictions.find(p => p.label === 'threat')?.results[0]?.probabilities[1] || 0)) * 100,
+            insult: (1 - (tfPredictions.find(p => p.label === 'insult')?.results[0]?.probabilities[1] || 0)) * 100
         };
         
         // Normaliza o texto para análise
@@ -616,8 +625,8 @@ const PORT = process.env.PORT || 3000;
 // Inicializa o modelo antes de iniciar o servidor
 initializeModel()
     .then(() => {
-        app.listen(3000, () => {
-            console.log('🚀 Servidor rodando em http://localhost:3000');
+        app.listen(PORT, () => {
+            console.log('🚀 Servidor rodando em http://localhost:' + PORT);
         });
     })
     .catch(error => {
