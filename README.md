@@ -1,103 +1,281 @@
-# 🗞️ VerificaOeste - Detector de Notícias Falsas
+# � VerificaFato - Sistema Verificador de Notícias
 
 <div align="center">
 
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org/)
-[![Express.js](https://img.shields.io/badge/Express-4.18-blue)](https://expressjs.com/)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow.js-4.22-yellow)](https://www.tensorflow.org/js)
-[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple)](https://getbootstrap.com/)
-[![License](https://img.shields.io/badge/License-ISC-red)](#licença)
-[![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-%23FF6B35)](#status)
+![Badge Status](https://img.shields.io/badge/Status-Ativo-success?style=flat-square)
+![Badge Version](https://img.shields.io/badge/Versão-1.0.0-blue?style=flat-square)
+![Badge License](https://img.shields.io/badge/Licença-ISC-green?style=flat-square)
 
-**Combatendo fake news no Oeste do Paraná com IA e verificação cruzada**
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.18-000000?style=flat-square&logo=express)](https://expressjs.com/)
+[![TensorFlow.js](https://img.shields.io/badge/TensorFlow.js-4.11-FF6F00?style=flat-square&logo=tensorflow)](https://www.tensorflow.org/js)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=flat-square&logo=bootstrap)](https://getbootstrap.com/)
 
-[🌐 Website](#) • [📋 Documentação](#documentação) • [🐛 Reportar Bug](#suporte) • [💡 Sugerir Ideia](#suporte)
+---
+
+### 🎯 **Uma plataforma inteligente para verificar a veracidade de notícias**
+
+[Início Rápido](#-quick-start) • [Funcionalidades](#-funcionalidades) • [Instalação](#-instalação) • [Uso](#-como-usar) • [Contribuir](#-contribuição)
 
 </div>
 
 ---
 
-## 📌 Visão Geral
+## 📋 Sobre o Projeto
 
-**VerificaOeste** é um sistema inteligente de verificação e análise de notícias especializado na região Oeste do Paraná. Utiliza machine learning, análise de toxicidade e verificação cruzada com fontes regionais confiáveis para detectar e classificar notícias falsas.
+**VerificaFato** é um aplicativo web moderno que utiliza inteligência artificial e análise de conteúdo para ajudar na detecção de notícias falsas (fake news). O sistema foi desenvolvido como um projeto educacional e de pesquisa para combater a desinformação.
 
-Com foco nos **54 municípios do Oeste Paranaense**, o sistema oferece uma ferramenta gratuita e acessível para jornalistas, cidadãos e organizações combaterem a desinformação.
+Com uma interface intuitiva e ferramentas poderosas, o VerificaFato oferece:
+- 🤖 Análise inteligente com Machine Learning
+- 🔍 Detecção de padrões de desinformação
+- 📊 Histórico de análises
+- 🌙 Suporte a Dark Mode
+- 📱 Design responsivo para qualquer dispositivo
 
 ---
 
-## ✨ Características Principais
+## ✨ Funcionalidades
 
-### 🤖 Análise Inteligente
-- **Machine Learning**: Modelo TensorFlow para análise de conteúdo
-- **Detecção de Toxicidade**: Identifica linguagem agressiva ou enganosa
-- **Análise de Crédibilidade**: Verifica compatibilidade com fontes oficiais
-- **Contextualização Regional**: Entende nuances do Oeste do Paraná
-
-### 🌍 Regionalização
-- ✅ Foco em **11 principais municípios** do Oeste Paranaense
-- ✅ Integração com **9+ fontes locais** confiáveis
-- ✅ Contexto social e político regional
-- ✅ Dados específicos da região
-
-### 📱 Interface Moderna
-- ✅ Design limpo e intuitivo
-- ✅ **Dark Mode** completo (modo claro/escuro)
-- ✅ Responsivo (desktop, tablet, mobile)
-- ✅ Acessibilidade (WCAG AA)
-
-### 🔐 Privacidade e Segurança
-- ✅ Sem armazenamento de dados pessoais
-- ✅ CORS configurado
-- ✅ Validação de inputs
-- ✅ Análise local do conteúdo
-
-### 💾 Persistência
-- ✅ Preferências salvas em localStorage
-- ✅ Histórico de análises
-- ✅ Tema do usuário preservado
+| Funcionalidade | Descrição |
+|---|---|
+| 🤖 **Machine Learning** | Utiliza TensorFlow.js para análise de conteúdo |
+| 🔍 **Detecção de Toxicidade** | Identifica linguagem agressiva ou enganosa |
+| 📈 **Análise de Crédibilidade** | Verifica compatibilidade com padrões conhecidos |
+| 💾 **Histórico Local** | Salva análises no navegador do usuário |
+| 🎨 **Dark Mode** | Interface com suporte completo a tema escuro |
+| 📱 **Responsivo** | Funciona perfeitamente em desktop, tablet e mobile |
+| 🔐 **Privado** | Dados não são armazenados no servidor |
+| ⚡ **Rápido** | Processamento local para máxima velocidade |
 
 ---
 
 ## 🚀 Quick Start
 
 ### Pré-requisitos
-```bash
-Node.js 18+ 
-npm 9+
-RAM: 2GB mínimo (para TensorFlow)
-```
+
+- **Node.js** 18 ou superior
+- **npm** 9 ou superior
+- **RAM** 2GB mínimo para TensorFlow.js
+- **Git** para clonar o repositório
 
 ### Instalação Rápida
 
 ```bash
-# Clonar repositório
-git clone https://github.com/seu-usuario/VerificaOeste-Parana.git
-cd VerificaOeste-Parana
+# 1️⃣ Clonar o repositório
+git clone https://github.com/seu-usuario/VerificaFato.git
+cd VerificaFato
 
-# Instalar dependências
+# 2️⃣ Instalar dependências
 npm install
 
-# Configurar variáveis de ambiente
+# 3️⃣ Configurar variáveis de ambiente (opcional)
 cp .env.example .env
 
-# Iniciar servidor
+# 4️⃣ Iniciar o servidor
 npm start
 ```
 
-O site estará disponível em **http://localhost:3000**
+Acesse **http://localhost:3000** no seu navegador e comece a usar! 🎉
+
+### Comandos Disponíveis
+
+```bash
+npm start          # Inicia o servidor em produção
+npm run dev        # Inicia com nodemon para desenvolvimento
+npm test           # Executa testes da API
+```
 
 ---
 
-## 📖 Documentação
+## 📁 Estrutura do Projeto
 
-### Para Usuários Finais
-- 🎯 [Como Usar o VerificaOeste](#como-usar)
-- 📚 [Guia de Funcionalidades](#funcionalidades)
-- 🌙 [Dark Mode - Guia Completo](./DARK_MODE.md)
+```
+VerificaFato/
+├── public/                 # Arquivos estáticos (HTML, CSS, JS)
+│   ├── index.html         # Página principal
+│   ├── css/               # Estilos
+│   │   ├── style.css
+│   │   ├── responsive.css
+│   │   └── results.css
+│   └── js/                # Scripts do cliente
+│       ├── main.js
+│       ├── dark-mode.js
+│       └── education.js
+├── js/                    # Scripts compartilhados
+│   └── googleService.js   # Serviço de integração
+├── server.js              # Servidor Express
+├── googleService.js       # Backend do serviço
+├── package.json          # Dependências do projeto
+└── README.md             # Este arquivo
+```
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+### Backend
+- **Node.js** - Runtime JavaScript
+- **Express.js** - Framework web minimalista
+- **Axios** - Cliente HTTP
+- **Cheerio** - Parser HTML/XML
+- **Dotenv** - Gerenciador de variáveis de ambiente
+
+### Frontend
+- **HTML5** - Markup semântico
+- **CSS3** - Estilos responsivos
+- **Bootstrap 5** - Framework CSS
+- **JavaScript Vanilla** - Lógica do cliente
+- **TensorFlow.js** - Machine Learning no navegador
+
+### IA & ML
+- **TensorFlow.js** - Framework de ML
+- **Toxicity Detector** - Modelo de toxicidade do TensorFlow
+
+---
+
+## 📖 Como Usar
+
+### Para Usuários
+
+1. **Abra a aplicação** em http://localhost:3000
+2. **Cole o texto** da notícia ou artigo a verificar
+3. **Clique em "Analisar"** e aguarde o processamento
+4. **Visualize os resultados** com análise detalhada
+5. **Ative Dark Mode** conforme preferência pessoal
 
 ### Para Desenvolvedores
-- 🔧 [Setup de Desenvolvimento](#desenvolvimento)
-- 📋 [Estrutura de Pastas](#estrutura-do-projeto)
+
+A aplicação oferece endpoints REST para integração:
+
+#### Analisar Notícia
+```http
+POST /api/verify
+Content-Type: application/json
+
+{
+  "text": "Texto da notícia para verificar"
+}
+```
+
+**Resposta:**
+```json
+{
+  "toxicity": 0.25,
+  "credibility": 0.78,
+  "status": "SUSPEITA"
+}
+```
+
+---
+
+## 🔧 Desenvolvimento
+
+### Setup de Desenvolvimento
+
+```bash
+# Instalar dependências de desenvolvimento
+npm install --save-dev nodemon
+
+# Iniciar em modo watch
+npm run dev
+```
+
+### Variáveis de Ambiente
+
+Crie um arquivo `.env` baseado em `.env.example`:
+
+```env
+NODE_ENV=development
+PORT=3000
+LOG_LEVEL=info
+```
+
+### Debug
+
+Para ativar logs detalhados:
+
+```bash
+DEBUG=* npm start
+```
+
+---
+
+## 📊 Endpoints da API
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| `GET` | `/` | Página principal |
+| `POST` | `/api/verify` | Verifica notícia |
+| `GET` | `/api/health` | Status da aplicação |
+
+---
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas! Para contribuir:
+
+1. Faça um **Fork** do repositório
+2. Crie uma **branch** para sua feature (`git checkout -b feature/AmazingFeature`)
+3. **Commit** suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Faça **Push** para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um **Pull Request**
+
+### Diretrizes
+
+- Siga o código existente
+- Adicione comentários para código complexo
+- Atualize a documentação conforme necessário
+- Teste suas mudanças antes de fazer PR
+
+---
+
+## 🐛 Reportar Problemas
+
+Encontrou um bug? Abra uma [issue no GitHub](https://github.com/seu-usuario/VerificaFato/issues) com:
+
+- ✅ Descrição clara do problema
+- ✅ Passos para reproduzir
+- ✅ Comportamento esperado vs atual
+- ✅ Screenshots (se aplicável)
+- ✅ Ambiente (SO, navegador, versão do Node.js)
+
+---
+
+## 📝 Licença
+
+Este projeto está licenciado sob a **ISC License** - veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+---
+
+## 👨‍💻 Autor
+
+Desenvolvido com ❤️ por **Emilly, Luiz e Miguel**
+
+### Agradecimentos
+
+- 🎓 Gratidão ao IFPR por apoiar projetos educacionais
+- 📚 TensorFlow e comunidade open-source
+- 🙏 Todos os contribuidores
+
+---
+
+## 📞 Suporte
+
+Se tiver dúvidas ou precisar de ajuda:
+
+- 📧 **Email:** seu-email@example.com
+- 🐛 **Issues:** [GitHub Issues](https://github.com/seu-usuario/VerificaFato/issues)
+- 💬 **Discussões:** [GitHub Discussions](https://github.com/seu-usuario/VerificaFato/discussions)
+
+---
+
+<div align="center">
+
+### ⭐ Gostou? Deixe uma estrela no repositório!
+
+**Desenvolvido com paixão e muita ☕**
+
+</div>
 - 🛠️ [API Reference](#api)
 - 🚀 [Deploy](#deployment)
 
