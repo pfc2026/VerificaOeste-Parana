@@ -49,14 +49,17 @@ body {
 }
 
 .search-box {
-    border: 1px solid #d1d5db;
+    border: 2px solid #0f766e;
     padding: 0.75rem;
     font-size: 1rem;
+    background-color: #f0fffe;
+    color: #1f2937;
 }
 
 .search-box::placeholder {
-    color: #9ca3af;
+    color: #4b7f77;
     font-style: italic;
+    font-weight: 500;
 }
 
 .search-box:focus {
@@ -76,12 +79,13 @@ body {
 
 .form-select {
     border-radius: 8px;
-    border: 2px solid #d1d5db;
+    border: 2px solid #0f766e;
     padding: 0.75rem;
     transition: all 0.3s ease;
-    background-color: white;
+    background-color: #f0fffe;
     color: #1f2937;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231f2937' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    font-weight: 500;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%230f766e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     background-size: 16px 12px;
@@ -90,21 +94,23 @@ body {
 }
 
 .form-select:hover {
-    border-color: #0f766e;
+    border-color: #0d5d56;
+    background-color: #e6faf8;
 }
 
 .form-select:focus {
-    border-color: #0f766e;
-    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%230f766e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    border-color: #0d5d56;
+    box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.2);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%230d5d56' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
     outline: none;
 }
 
 .form-select:disabled {
-    background-color: #f3f4f6;
-    border-color: #d1d5db;
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
     color: #6b7280;
     cursor: not-allowed;
+    opacity: 0.7;
 }
 
 /* ========== BOTÃO DE VERIFICAÇÃO ========== */
