@@ -1,0 +1,68 @@
+const Search = require('../models/Search');
+
+/**
+ * Serviço para persistir resultados de “notícias pesquisadas”.
+ */
+async function saveSearch({ usuario, modo, texto, url, resultado }) {
+  // Normalização básica de veredito/porcentagem quando existir na resposta.
+  // Mantém compatível com diferentes formatos do seu frontend/engine.
+  const veredito =
+    resultado?.veredito ||
+    resultado?.resultado ||
+    resultado?.status ||
+    (resultado?.analise?.porcentagemVerdade !== undefined ? '' : '');
+
+  const porcentagem =
+    resultado?.porcentagem ||
+    resultado?.confianca ||
+    resultado?.porcentagemVerdade ||
+    resultado?.veracityPercentage ||
+    null;
+
+  return Search.create({
+    usuario,
+    modo,
+    texto: modo === 'texto' ? texto : '',
+    url: modo === 'link' ? url : '',
+    resultado: resultado || {},
+    veredito: typeof veredito === 'string' ? veredito : '',
+    porcentagem: typeof porcentagem === 'number' ? porcentagem : null,
+  });
+}
+
+async function listSearches({ usuarioId, filtros }) {
+  const { page = 1, limit = 10, q, veredito, modo } = filtros;
+
+  const filter = { usuario: usuarioId };
+  if (modo) filter.modo = modo;
+  if (veredito) filter.veredito = veredito;
+  if (q) {
+    filter.$or = [
+      { texto: { $regex: q, $options: 'i' } },
+      { url: { $regex: q, $options: 'i' } },
+      { veredito: { $regex: q, $options: 'i' } },
+      { 'resultado.observacao': { $regex: q, $options: 'i' } },
+    ];
+  }
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const [items, totalItems] = await Promise.all([
+    Search.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit)),
+    Search.countDocuments(filter),
+  ]);
+
+  return {
+    items,
+    page: Number(page),
+    limit: Number(limit),
+    totalItems,
+    totalPages: Math.max(1, Math.ceil(totalItems / Number(limit))),
+  };
+}
+
+module.exports = { saveSearch, listSearches };
+
