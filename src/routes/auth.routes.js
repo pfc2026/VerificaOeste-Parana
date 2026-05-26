@@ -47,8 +47,6 @@ router.post(
   (req, res, next) => authController.login(req, res, next)
 );
 
-const { authJwt } = require('../middlewares/authJwt');
-
 // Dados do usuário logado
 // @openapi
 // /api/auth/me:

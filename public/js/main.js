@@ -84,7 +84,7 @@ function populateSelects() {
         option.textContent = category;
         categorySelect.appendChild(option);
     });
-}
+}m
 
 window.onload = populateSelects;
 

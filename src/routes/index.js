@@ -3,6 +3,7 @@ const express = require('express');
 const authRoutes = require('./auth.routes');
 const usersRoutes = require('./users.routes');
 const verificationsRoutes = require('./verifications.routes');
+const verificacaoRoutes = require('./verificacao.routes');
 const logsRoutes = require('./logs.routes');
 const searchRoutes = require('./search.routes');
 
@@ -15,8 +16,11 @@ router.use('/auth', authRoutes);
 // Rotas de usuários
 router.use('/users', usersRoutes);
 
-// Rotas de verificações
+// Rotas de verificações (documento/validações)
 router.use('/verifications', verificationsRoutes);
+
+// Rota de verificação de notícias (público)
+router.use('/verificar', verificacaoRoutes);
 
 // Rotas de logs
 router.use('/logs', logsRoutes);

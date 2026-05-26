@@ -114,22 +114,25 @@ VerificaFato/
 ## 🛠️ Tecnologias Utilizadas
 
 ### Backend
-- **Node.js** - Runtime JavaScript
-- **Express.js** - Framework web minimalista
+- **Node.js** 22+ - Runtime JavaScript
+- **Express.js** 4.18+ - Framework web RESTful
+- **MongoDB/Mongoose** 9.6+ - Banco de dados NoSQL
+- **JWT** - Autenticação e autorização
+- **Bcryptjs** - Hashing de senhas
 - **Axios** - Cliente HTTP
-- **Cheerio** - Parser HTML/XML
-- **Dotenv** - Gerenciador de variáveis de ambiente
+- **Swagger/OpenAPI** - Documentação automática de APIs
 
 ### Frontend
 - **HTML5** - Markup semântico
-- **CSS3** - Estilos responsivos
-- **Bootstrap 5** - Framework CSS
+- **CSS3** - Estilos responsivos e Dark Mode
+- **Bootstrap 5** - Framework CSS moderno
 - **JavaScript Vanilla** - Lógica do cliente
-- **TensorFlow.js** - Machine Learning no navegador
+- **TensorFlow.js** 4.11+ - Machine Learning no navegador
 
-### IA & ML
-- **TensorFlow.js** - Framework de ML
-- **Toxicity Detector** - Modelo de toxicidade do TensorFlow
+### DevOps
+- **Docker** - Containerização (em planejamento)
+- **npm/Node Package Manager** - Gestão de dependências
+- **Nodemon** - Auto-reload em desenvolvimento
 
 ---
 
@@ -137,141 +140,278 @@ VerificaFato/
 
 ### Para Usuários
 
-1. **Abra a aplicação** em http://localhost:3000
-2. **Cole o texto** da notícia ou artigo a verificar
-3. **Clique em "Analisar"** e aguarde o processamento
-4. **Visualize os resultados** com análise detalhada
-5. **Ative Dark Mode** conforme preferência pessoal
+1. **Acesse** http://localhost:3000
+2. **Digite ou cole** uma notícia para verificar
+3. **Clique em "Pesquisar Notícias"** 
+4. **Visualize os resultados** com análise de IA detalhada
+5. **Faça login** (opcional) para salvar histórico de análises
 
 ### Para Desenvolvedores
 
-A aplicação oferece endpoints REST para integração:
+#### Setup Local
 
-#### Analisar Notícia
+```bash
+# 1. Clonar repositório
+git clone https://github.com/seu-usuario/VerificaOeste-Parana.git
+cd VerificaOeste-Parana
+
+# 2. Instalar dependências
+npm install
+
+# 3. Configurar MongoDB
+# Certifique-se de que MongoDB está rodando em localhost:27017
+
+# 4. Configurar variáveis de ambiente
+cp .env.example .env  # E preencher com suas variáveis
+
+# 5. Iniciar servidor
+npm run dev          # Desenvolvimento com hot-reload
+# ou
+npm start            # Produção
+```
+
+#### Testar API
+
+```bash
+# Executar suite de testes
+npm test
+
+# ou especificamente
+npm run test:api
+```
+
+---
+
+## 🔌 Endpoints da API
+
+| Método | Rota | Autenticação | Descrição |
+|--------|------|--------------|-----------|
+| **GET** | `/` | ❌ | Página principal |
+| **GET** | `/api/health` | ❌ | Status da API |
+| **GET** | `/api-docs` | ❌ | Documentação Swagger |
+| **POST** | `/api/verificar` | ❌ | Verifica notícia (público) |
+| **POST** | `/api/auth/register` | ❌ | Registra novo usuário |
+| **POST** | `/api/auth/login` | ❌ | Login e obter JWT |
+| **GET** | `/api/auth/me` | ✅ JWT | Dados do usuário logado |
+| **POST** | `/api/verifications` | ✅ JWT | Criar verificação |
+| **GET** | `/api/verifications` | ✅ JWT | Listar verificações |
+| **PATCH** | `/api/verifications/:id` | ✅ JWT | Atualizar verificação |
+| **POST** | `/api/search` | ✅ JWT | Salvar busca realizada |
+| **GET** | `/api/search` | ✅ JWT | Listar histórico de buscas |
+| **GET** | `/api/logs` | ✅ JWT (Admin) | Visualizar logs do sistema |
+
+---
+
+## 📊 Exemplo de Requisição
+
+### Verificar Notícia (Público)
+
 ```http
-POST /api/verify
+POST /api/verificar HTTP/1.1
+Host: localhost:3000
 Content-Type: application/json
 
 {
-  "text": "Texto da notícia para verificar"
+  "modo": "texto",
+  "texto": "Prefeitura de Cascavel anuncia novo programa de educação",
+  "cidade": "cascavel",
+  "categoria": "política"
 }
 ```
 
 **Resposta:**
 ```json
 {
-  "toxicity": 0.25,
-  "credibility": 0.78,
-  "status": "SUSPEITA"
+  "sucesso": true,
+  "dados": {
+    "analiseIA": {
+      "porcentagemVerdade": 78,
+      "detalhes": [
+        {
+          "aspect": "Suspição de padrões",
+          "probability": 78
+        }
+      ]
+    },
+    "factChecks": [
+      {
+        "alegacao": "Prefeitura anuncia investimentos",
+        "avaliacao": "Verdadeiro",
+        "verificador": "Fact Check Brasil",
+        "url_revisao": "https://example.com"
+      }
+    ]
+  }
 }
 ```
 
 ---
 
-## 🔧 Desenvolvimento
+## 🔧 Configuração de Variáveis de Ambiente
 
-### Setup de Desenvolvimento
-
-```bash
-# Instalar dependências de desenvolvimento
-npm install --save-dev nodemon
-
-# Iniciar em modo watch
-npm run dev
-```
-
-### Variáveis de Ambiente
-
-Crie um arquivo `.env` baseado em `.env.example`:
+Crie um arquivo `.env` na raiz:
 
 ```env
+# Servidor
 NODE_ENV=development
 PORT=3000
-LOG_LEVEL=info
+
+# Database
+MONGODB_URI=mongodb://localhost:27017/pfc2026ifpr_db
+MONGODB_DB_NAME=pfc2026ifpr_db
+
+# Autenticação
+JWT_SECRET=sua_chave_secreta_aqui_mudar_em_producao
+JWT_EXPIRES_IN=7d
+
+# Seed Admin (preenchimento inicial)
+SEED_ADMIN_EMAIL=admin@verificaoeste.com
+SEED_ADMIN_PASSWORD=Admin@123
+
+# Google Fact Check API
+GOOGLE_API_KEY=sua_chave_google_aqui
+FACT_CHECK_BASE_URL=https://factchecktools.googleapis.com
+
+# CORS
+CORS_ORIGIN=*
+
+# Swagger
+SWAGGER_SERVER_URL=http://localhost:3000
 ```
 
-### Debug
+> ⚠️ **IMPORTANTE:** Sempre mantenha o `.env` seguro. Nunca commitar com valores reais!
 
-Para ativar logs detalhados:
+---
+
+## 🚀 Deployment
+
+### Preparar para Produção
 
 ```bash
-DEBUG=* npm start
+# 1. Instalar dependências apenas de produção
+npm install --only=production
+
+# 2. Definir variáveis de ambiente em produção
+export NODE_ENV=production
+export MONGODB_URI=sua_uri_mongodb_em_producao
+# ... (todas as outras variáveis necessárias)
+
+# 3. Iniciar servidor
+npm start
+```
+
+### Com Docker (Próximas Versões)
+
+```dockerfile
+# Dockerfile
+FROM node:22-alpine
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
 ```
 
 ---
 
-## 📊 Endpoints da API
+## 🧪 Testes
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| `GET` | `/` | Página principal |
-| `POST` | `/api/verify` | Verifica notícia |
-| `GET` | `/api/health` | Status da aplicação |
+A suite de testes cobre todos os endpoints principais:
+
+```bash
+npm test
+```
+
+Testa:
+- ✅ Health Check
+- ✅ Autenticação (Register/Login)
+- ✅ Verificador de notícias
+- ✅ CRUD de verificações
+- ✅ Histórico de buscas
+- ✅ Swagger/Documentação
+
+---
+
+## 📋 Convenções de Código
+
+- **ES6+** - Use `const` por padrão, `let` quando necessário
+- **Async/Await** - Sempre prefira async/await a Promises
+- **Comentários** - Documente funções complexas
+- **Nomes** - Variáveis em camelCase, classes em PascalCase
+- **Validação** - Sempre valide entrada do usuário
 
 ---
 
 ## 🤝 Contribuição
 
-Contribuições são bem-vindas! Para contribuir:
+Contribuições são bem-vindas! 
 
 1. Faça um **Fork** do repositório
-2. Crie uma **branch** para sua feature (`git checkout -b feature/AmazingFeature`)
-3. **Commit** suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Faça **Push** para a branch (`git push origin feature/AmazingFeature`)
+2. Crie uma **branch** (`git checkout -b feature/sua-feature`)
+3. **Commit** suas mudanças (`git commit -m 'Add: descrição clara'`)
+4. **Push** para a branch (`git push origin feature/sua-feature`)
 5. Abra um **Pull Request**
 
-### Diretrizes
+### Tipos de Commits
 
-- Siga o código existente
-- Adicione comentários para código complexo
-- Atualize a documentação conforme necessário
-- Teste suas mudanças antes de fazer PR
+- `feat:` - Nova funcionalidade
+- `fix:` - Correção de bug
+- `docs:` - Documentação
+- `style:` - Formatação de código
+- `refactor:` - Refatoração sem mudança funcional
+- `test:` - Testes
+- `perf:` - Melhorias de performance
 
 ---
 
 ## 🐛 Reportar Problemas
 
-Encontrou um bug? Abra uma [issue no GitHub](https://github.com/seu-usuario/VerificaFato/issues) com:
+Encontrou um bug? Abra uma [issue no GitHub](https://github.com/seu-usuario/VerificaOeste-Parana/issues) com:
 
-- ✅ Descrição clara do problema
+- ✅ Descrição clara
 - ✅ Passos para reproduzir
 - ✅ Comportamento esperado vs atual
-- ✅ Screenshots (se aplicável)
-- ✅ Ambiente (SO, navegador, versão do Node.js)
+- ✅ Ambiente (SO, Node.js version)
 
 ---
 
 ## 📝 Licença
 
-Este projeto está licenciado sob a **ISC License** - veja o arquivo [LICENSE](LICENSE) para detalhes.
+Este projeto está sob **ISC License** - veja [LICENSE](LICENSE)
 
 ---
 
-## 👨‍💻 Autor
+## 👨‍💻 Autores
 
-Desenvolvido com ❤️ por **Emilly, Luiz e Miguel**
+Desenvolvido com ❤️ por:
+- **Emilly**
+- **Luiz Felipe**
+- **Miguel**
 
 ### Agradecimentos
 
-- 🎓 Gratidão ao IFPR por apoiar projetos educacionais
-- 📚 TensorFlow e comunidade open-source
+- 🎓 IFPR - Instituto Federal do Paraná
+- 📚 Comunidade Open Source
 - 🙏 Todos os contribuidores
 
 ---
 
-## 📞 Suporte
+## 📞 Contato & Suporte
 
-Se tiver dúvidas ou precisar de ajuda:
-
-- 📧 **Email:** seu-email@example.com
-- 🐛 **Issues:** [GitHub Issues](https://github.com/seu-usuario/VerificaFato/issues)
-- 💬 **Discussões:** [GitHub Discussions](https://github.com/seu-usuario/VerificaFato/discussions)
+- 📧 **Email:** contato@verificaoeste.com
+- 🐛 **Issues:** [GitHub Issues](https://github.com/seu-usuario/VerificaOeste-Parana/issues)
+- 💬 **Discussões:** [GitHub Discussions](https://github.com/seu-usuario/VerificaOeste-Parana/discussions)
 
 ---
 
 <div align="center">
 
-### ⭐ Gostou? Deixe uma estrela no repositório!
+### ⭐ Gostou? Deixe uma estrela! ⭐
 
 **Desenvolvido com paixão e muita ☕**
 
@@ -360,24 +500,41 @@ Saída: Classificação detalhada
 
 ```
 VerificaOeste-Parana/
-├── public/
-│   ├── index.html              # Página principal
+├── public/                         # Arquivos estáticos servidos pelo Express
+│   ├── index.html                  # Página principal
+│   ├── auth.html                   # Página de autenticação
+│   ├── history.html                # Histórico de análises
 │   ├── css/
-│   │   ├── style.css           # Estilos principal (com Dark Mode)
-│   │   ├── responsive.css      # Estilos responsivos
-│   │   └── results.css         # Estilos dos resultados
+│   │   ├── style.css               # Estilos principal
+│   │   ├── responsive.css          # Estilos responsivos
+│   │   └── results.css             # Estilos dos resultados
 │   └── js/
-│       ├── main.js             # Lógica principal
-│       ├── dark-mode.js        # Sistema de Dark Mode ✨
-│       └── dark-mode-test.js   # Testes do Dark Mode
-├── js/
-│   └── (scripts backend - movidos para raiz)
-├── server.js                   # Servidor Express
-├── googleService.js            # Integração com Google
-├── testGoogleAPI.js            # Testes da API
-├── package.json                # Dependências
-├── .env                        # Variáveis de ambiente
-├── README.md                   # Este arquivo
+│       ├── main.js                 # Lógica principal do verificador
+│       ├── auth.js                 # Autenticação frontend
+│       ├── dark-mode.js            # Sistema de Dark Mode
+│       ├── history.js              # Histórico de buscas
+│       ├── education.js            # Conteúdo educativo
+│       └── search-persist.js       # Persistência de buscas
+├── src/                            # Backend (Node.js)
+│   ├── server.js                   # Bootstrap do servidor
+│   ├── app.js                      # Configuração Express
+│   ├── config/
+│   │   ├── env.js                  # Variáveis de ambiente
+│   │   ├── db.js                   # Conexão MongoDB
+│   │   └── swagger.js              # Documentação OpenAPI
+│   ├── controllers/                # Controladores MVC
+│   ├── routes/                     # Definição de rotas
+│   ├── models/                     # Modelos Mongoose
+│   ├── middlewares/                # Middlewares Express
+│   ├── services/                   # Lógica de negócio
+│   └── seed/                       # Dados iniciais
+├── tests/                          # Testes da API
+│   └── testAPI.js                  # Suite de testes completa
+├── server.js                       # Wrapper que chama src/server.js
+├── package.json                    # Dependências do projeto
+├── .env                            # Variáveis de ambiente (versionado com exemplo)
+└── README.md                       # Este arquivo
+```
 ├── DARK_MODE.md                # Documentação Dark Mode
 ├── IMPLEMENTATION_REPORT.md    # Relatório de implementação
 └── TODO.md                     # Tarefas futuras

@@ -5,6 +5,7 @@ const path = require('path');
 const routes = require('./routes');
 const { swaggerSetup } = require('./config/swagger');
 const { errorHandler } = require('./middlewares/errorHandler');
+const { responseNormalizer } = require('./middlewares/responseNormalizer');
 
 /**
  * Cria e configura a aplicação Express.
@@ -16,6 +17,9 @@ function createApp() {
 
   // JSON parser
   app.use(express.json({ limit: '1mb' }));
+
+  // Normalizar respostas para formato esperado pelo frontend
+  app.use(responseNormalizer);
 
   // Servir arquivos estáticos (mantém compatível com o frontend já existente)
   app.use(express.static(path.join(__dirname, '..', 'public')));

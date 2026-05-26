@@ -3,7 +3,7 @@ const Search = require('../models/Search');
 /**
  * Serviço para persistir resultados de “notícias pesquisadas”.
  */
-async function saveSearch({ usuario, modo, texto, url, resultado }) {
+async function saveSearch({ usuario, modo, texto, url, resultado, cidade, categoria, analiseIA, factChecks }) {
   // Normalização básica de veredito/porcentagem quando existir na resposta.
   // Mantém compatível com diferentes formatos do seu frontend/engine.
   const veredito =
@@ -17,6 +17,7 @@ async function saveSearch({ usuario, modo, texto, url, resultado }) {
     resultado?.confianca ||
     resultado?.porcentagemVerdade ||
     resultado?.veracityPercentage ||
+    analiseIA?.porcentagemVerdade ||
     null;
 
   return Search.create({
@@ -25,6 +26,10 @@ async function saveSearch({ usuario, modo, texto, url, resultado }) {
     texto: modo === 'texto' ? texto : '',
     url: modo === 'link' ? url : '',
     resultado: resultado || {},
+    cidade: cidade || '',
+    categoria: categoria || '',
+    analiseIA: analiseIA || {},
+    factChecks: factChecks || [],
     veredito: typeof veredito === 'string' ? veredito : '',
     porcentagem: typeof porcentagem === 'number' ? porcentagem : null,
   });

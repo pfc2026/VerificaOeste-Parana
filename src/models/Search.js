@@ -7,16 +7,15 @@ const mongoose = require('mongoose');
  * - entrada do usuário (texto/link)
  * - resultado do processamento (veredito/score/fontes/metadata)
  * - vínculo com o usuário (usuario)
- *
- * Observação:
- * - `resultado` usa Mixed porque a estrutura pode evoluir.
+ * - contexto regional (cidade, categoria)
+ * - análise de IA completa (analiseIA, factChecks)
  */
 const SearchSchema = new mongoose.Schema(
   {
     usuario: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false, // Pode ser anônimo
       index: true,
     },
 
@@ -36,10 +35,34 @@ const SearchSchema = new mongoose.Schema(
       default: '',
     },
 
+    // Contexto regional
+    cidade: {
+      type: String,
+      default: '',
+      index: true,
+    },
+    categoria: {
+      type: String,
+      default: '',
+      index: true,
+    },
+
     // Resultado do processamento (ML + fact-check + heurísticas, etc.)
     resultado: {
       type: mongoose.Schema.Types.Mixed,
       default: {},
+    },
+
+    // Análise de IA detalhada
+    analiseIA: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
+
+    // Fact-checks encontrados
+    factChecks: {
+      type: mongoose.Schema.Types.Mixed,
+      default: [],
     },
 
     // Campos facilitadores para filtros comuns

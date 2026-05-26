@@ -5,14 +5,18 @@ const { saveSearch, listSearches } = require('../services/search.service');
  */
 async function save(req, res, next) {
   try {
-    const { modo, texto, url, resultado } = req.body;
+    const { modo, texto, url, resultado, cidade, categoria, analiseIA, factChecks } = req.body;
 
     const saved = await saveSearch({
-      usuario: req.user.id,
+      usuario: req.user?.id || null,
       modo,
       texto: texto || '',
       url: url || '',
       resultado: resultado || {},
+      cidade: cidade || '',
+      categoria: categoria || '',
+      analiseIA: analiseIA || {},
+      factChecks: factChecks || [],
     });
 
     return res.status(201).json({ success: true, data: saved });
